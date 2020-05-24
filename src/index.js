@@ -13,7 +13,9 @@ function fetchUsers(url) {
 }
 
 function renderUsers(userData) {
-    let ul = document.getElementById("user_ul")
+    let main = document.querySelector("main")
+    let ul = document.createElement("user_ul")
+    main.appendChild(ul)
 
     userData.map((user) => {
         createUserli(user, ul)
