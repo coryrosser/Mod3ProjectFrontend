@@ -1,10 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const USERS_URL = "http://localhost:3000/users"
-    fetchUsers(USERS_URL);
-})
 
-function fetchUsers(url) {
-    fetch(url)
+    const USERS_URL = "http://localhost:3000/users"
+    
+    
+    function fetchUsers(url) {
+        fetch(url)
         .then(res => res.json())
         .then((userData) => {
             console.log(userData)
