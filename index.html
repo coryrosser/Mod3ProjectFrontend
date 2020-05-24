@@ -5,21 +5,52 @@
     <meta charset="utf-8">
     <title>Project</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.4/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.4/dist/semantic.min.js"></script>
     <script defer src="./src/index.js"></script>
+
 </head>
 
-<body>
-    <header>
-        <h2>Tonedeaf Traders</h2>
-    </header>
+<body class="pushable">
+    <div class="pusher">
+        <div class="ui vertical masthead center aligned">
 
-    <main>
-        <ul id="user_ul">
-            <!-- Add our Users -->
+            <div class="ui container">
+                <div class="ui large secondary pointing menu" id="nav-div">
+                    <a class="active item" id="nav-item-home">
+                        Home
+                    </a>
+                    <a class="item" id="nav-item-profile">
+                        My Profile
+                    </a>
+                    <a class="item" id="nav-item-listings">
+                        Listings
+                    </a>
+                    <div class="right menu" id="nav-item-logout">
+                        <a class="ui item">
+                        Logout
+                    </a>
+                    </div>
+                </div>
+            </div>
+            <div class="ui text container">
+                <h1 class="ui header">
+                    ToneDeaf Traders
+                </h1>
+                <h2>Trade your equipment with other musicians.</h2>
+                <button class="ui huge primary button" id="home-sign-in-button">
+            Sign In 
+            <i class="right arrow icon"></i>
+        </button>
+                <button class="ui huge primary button" id="home-sign-up-button">
+            Sign Up
+            <i class="right arrow icon"></i>
+        </button>
+            </div>
 
-        </ul>
-
-    </main>
+        </div>
+    </div>
 
 </body>
 
