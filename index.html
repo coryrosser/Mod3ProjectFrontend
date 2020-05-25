@@ -18,35 +18,32 @@
 
             <div class="ui container">
                 <div class="ui large secondary pointing menu" id="nav-div">
-                    <a class="active item" id="nav-item-home">
+                    <a class="active item" href="#home" id="nav-item-home">
                         Home
                     </a>
-                    <a class="item" id="nav-item-profile">
+                    <a class="item" href="#profile" id="nav-item-profile">
                         My Profile
                     </a>
-                    <a class="item" id="nav-item-listings">
+                    <a class="item" href="#listings" id="nav-item-listings">
                         Listings
                     </a>
-                    <div class="right menu" id="nav-item-logout">
+                    <div class="right menu" href="#logout" id="nav-item-logout">
                         <a class="ui item">
                         Logout
                     </a>
                     </div>
                 </div>
             </div>
-            <div class="ui text container">
-                <h1 class="ui header">
-                    ToneDeaf Traders
-                </h1>
-                <h2>Trade your equipment with other musicians.</h2>
-                <button class="ui huge primary button" id="home-sign-in-button">
-            Sign In 
-            <i class="right arrow icon"></i>
-        </button>
-                <button class="ui huge primary button" id="home-sign-up-button">
-            Sign Up
-            <i class="right arrow icon"></i>
-        </button>
+            <form id="login-form">
+                <div class="container" id="content-container">
+                    <label for="email">Email</label>
+                    <input id="login-email" type="text" placeholder="Enter Email" name="email" required>
+
+                    <label for="password"><b>Password</b></label>
+                    <input id="login-password" type="password" placeholder="Enter Password" name="password" required>
+
+                    <button id="login-submit" type="submit">Login</button>
+            </form>
             </div>
 
         </div>

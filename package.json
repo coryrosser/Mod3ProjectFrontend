@@ -1,24 +1,24 @@
 {
-  "name": "mod3projectfrontend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "dependencies": {
-    "fomantic-ui": "^2.8.4",
-    "gulp": "^4.0.2"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/coryrosser/Mod3ProjectFrontend.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/coryrosser/Mod3ProjectFrontend/issues"
-  },
-  "homepage": "https://github.com/coryrosser/Mod3ProjectFrontend#readme"
+    "name": "mod3projectfrontend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "dependencies": {
+        "fomantic-ui": "^2.8.4",
+        "gulp": "^4.0.2"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coryrosser/Mod3ProjectFrontend.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/coryrosser/Mod3ProjectFrontend/issues"
+    },
+    "homepage": "https://github.com/coryrosser/Mod3ProjectFrontend#readme"
 }
