@@ -1,5 +1,13 @@
 const USERS_URL = "http://localhost:3000/users"
 
+const windowStorage = window.localStorage
+    //Once logged in a users id is set in local storage, this function fetches the user from 
+    //Rails by interpolation that id in the url. then returns that user and its items
+let current_user = () => {
+    return JSON.parse(windowStorage.getItem('user'))
+}
+
+
 let homeScreen = () => {
     console.log("at home :)")
     let mainParentDiv = document.getElementById("page-content");
@@ -42,6 +50,11 @@ function getListings() {
     })
 }   
 
+        .then(itemData => {
+            renderItems(itemData)
+        })
+}
+//for development purposes
 function renderItems(itemData) {
     let mainParentDiv = document.getElementById("page-content");
     let itemUl = document.createElement("ul")
@@ -55,6 +68,19 @@ function renderItems(itemData) {
         tradeBtn.addEventListener("click", () => onTradeStart(item));
         itemUl.appendChild(itemLi)
     })
+=======
+
+        let tradeBtn = document.createElement("button")
+        tradeBtn.innerHTML = "Trade!"
+        tradeBtn.addEventListener("click", () => onTradeStart(item));
+
+        itemLi.appendChild(tradeBtn)
+
+
+        itemUl.appendChild(itemLi)
+    })
+}
+
 }
 
 
@@ -149,8 +175,12 @@ function onLoginSubmit(event) {
         .then(res => res.json())
         .then(res => {
             if (res.code == 200) {
+                windowStorage.clear()
                 showUserProfile(res.user)
                 console.log(res.message)
+                windowStorage.setItem('user', JSON.stringify(res.user))
+            } else {
+                alert("Invalid Credentials")
             }
 
         })
@@ -160,6 +190,7 @@ function onLoginSubmit(event) {
 function showUserProfile(user) {
     console.log(user)
 }
+
 
 //fetch and render users
 function fetchUsers(url) {
