@@ -1,14 +1,12 @@
 const USERS_URL = "http://localhost:3000/users"
+
+const windowStorage = window.localStorage
     //Once logged in a users id is set in local storage, this function fetches the user from 
     //Rails by interpolation that id in the url. then returns that user and its items
 let current_user = () => {
-    let user_id = parseInt(window.localStorage.getItem("user_id"))
-    fetch(`http://localhost:3000/users/${user_id}`)
-        .then(res => res.json())
-        .then(user => {
-            return user
-        })
+    return JSON.parse(windowStorage.getItem('user'))
 }
+
 
 let homeScreen = () => {
     console.log("at home :)")
@@ -141,10 +139,10 @@ function onLoginSubmit(event) {
         .then(res => res.json())
         .then(res => {
             if (res.code == 200) {
-                window.localStorage.removeItem("user_id")
+                windowStorage.clear()
                 showUserProfile(res.user)
                 console.log(res.message)
-                window.localStorage.setItem("user_id", `${res.user.id}`)
+                windowStorage.setItem('user', JSON.stringify(res.user))
             } else {
                 alert("Invalid Credentials")
             }
