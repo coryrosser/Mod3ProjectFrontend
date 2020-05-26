@@ -1,4 +1,14 @@
 const USERS_URL = "http://localhost:3000/users"
+    //Once logged in a users id is set in local storage, this function fetches the user from 
+    //Rails by interpolation that id in the url. then returns that user and its items
+let current_user = () => {
+    let user_id = parseInt(window.localStorage.getItem("user_id"))
+    fetch(`http://localhost:3000/users/${user_id}`)
+        .then(res => res.json())
+        .then(user => {
+            console.log(user)
+        })
+}
 
 let homeScreen = () => {
     console.log("at home :)")
@@ -31,11 +41,39 @@ function addNavElement(parent, elementName, elementId, callback) {
 }
 
 function getListings() {
+    let mainParentDiv = document.getElementById("page-content");
+    mainParentDiv.innerHTML = "";
     //using items url for now. will change when we have listings
     let listingsUrl = "http://localhost:3000/items"
     fetch(listingsUrl)
         .then(res => res.json())
-        .then(itemData => console.log(itemData))
+        .then(itemData => {
+            renderItems(itemData)
+        })
+}
+//for development purposes
+function renderItems(itemData) {
+    let mainParentDiv = document.getElementById("page-content");
+    let itemUl = document.createElement("ul")
+    mainParentDiv.appendChild(itemUl)
+    itemData.map((item) => {
+        let itemLi = document.createElement("li")
+        itemLi.innerText = `${item.brand}: ${item.model} Trade Rating: ${item.trade_rating}`
+
+        let tradeBtn = document.createElement("button")
+        tradeBtn.innerHTML = "Trade!"
+        tradeBtn.addEventListener("click", () => onTradeStart(item));
+
+        itemLi.appendChild(tradeBtn)
+
+
+        itemUl.appendChild(itemLi)
+    })
+}
+
+function onTradeStart(item) {
+    console.log(item)
+    console.log(current_user())
 }
 
 function getLoginForm() {
@@ -103,8 +141,12 @@ function onLoginSubmit(event) {
         .then(res => res.json())
         .then(res => {
             if (res.code == 200) {
+                window.localStorage.removeItem("user_id")
                 showUserProfile(res.user)
                 console.log(res.message)
+                window.localStorage.setItem("user_id", `${res.user.id}`)
+            } else {
+                alert("Invalid Credentials")
             }
 
         })
@@ -114,6 +156,7 @@ function onLoginSubmit(event) {
 function showUserProfile(user) {
     console.log(user)
 }
+
 
 //fetch and render users
 function fetchUsers(url) {
