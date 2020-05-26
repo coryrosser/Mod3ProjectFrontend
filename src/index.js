@@ -6,7 +6,7 @@ let current_user = () => {
     fetch(`http://localhost:3000/users/${user_id}`)
         .then(res => res.json())
         .then(user => {
-            console.log(user)
+            return user
         })
 }
 
