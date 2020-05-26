@@ -54,11 +54,6 @@ function getListings() {
     let listingsUrl = "http://localhost:3000/items"
     fetch(listingsUrl)
         .then(res => res.json())
-        .then(itemData => {  
-            renderItems(itemData)
-    })
-}   
-
         .then(itemData => {
             console.log(itemData.map((item) => item.user))
             renderItems(itemData)
@@ -78,19 +73,9 @@ function renderItems(itemData) {
         tradeBtn.addEventListener("click", () => onTradeStart(item));
         itemUl.appendChild(itemLi)
     })
-
-        let tradeBtn = document.createElement("button")
-        tradeBtn.innerHTML = "Trade!"
-        tradeBtn.addEventListener("click", () => onTradeStart(item));
-
-        itemLi.appendChild(tradeBtn)
-
-
-        itemUl.appendChild(itemLi)
-    })
 }
 
-}
+
 
 
 function onTradeStart(item) {
@@ -99,25 +84,25 @@ function onTradeStart(item) {
 
     console.log(current_user())
     console.log(current_user().items)
-  
+
     let c = confirm("Are you sure you want to trade for this item?")
-    if(c !== false) {
+    if (c !== false) {
         startTrade(item);
     }
- 
-let tradeStatus = 0;   
-    
-function startTrade(item, ) {
-    debugger;
-    let tradee = item.user_id;
-    let tradeeItemId = item.id;
-}
-    
-    
+
+    let tradeStatus = 0;
+
+    function startTrade(item, ) {
+        debugger;
+        let tradee = item.user_id;
+        let tradeeItemId = item.id;
+    }
+
+
     console.log(`${tradee} is the user id number. ${tradeeItemId} is the trader item number`)
-    // console.log(item.user_id)
-    // console.log(item.brand);
-    // console.log(item.id)
+        // console.log(item.user_id)
+        // console.log(item.brand);
+        // console.log(item.id)
 }
 
 //Trade Item Start
