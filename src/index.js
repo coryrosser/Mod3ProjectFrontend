@@ -1,10 +1,19 @@
 const USERS_URL = "http://localhost:3000/users"
 
 const windowStorage = window.localStorage
-    //Once logged in a users id is set in local storage, this function fetches the user from 
-    //Rails by interpolation that id in the url. then returns that user and its items
+
 let current_user = () => {
-    return JSON.parse(windowStorage.getItem('user'))
+    //Once logged in a users object is set in local storage by using JSON.stringify
+    // this function retrives that user and parses it to convert back to obj form
+    //using this function should always return an object that can be used as any other.
+    //eg. current_user().first_name >> "Cory", "Joey" etc
+
+    //see onLoginSubmit for how the obj is stored
+    let userData = {
+        user: JSON.parse(windowStorage.getItem('user')),
+        items: JSON.parse(windowStorage.getItem('items'))
+    }
+    return userData
 }
 
 
@@ -46,6 +55,7 @@ function getListings() {
     fetch(listingsUrl)
         .then(res => res.json())
         .then(itemData => {
+            console.log(itemData.map((item) => item.user))
             renderItems(itemData)
         })
 }
@@ -70,8 +80,11 @@ function renderItems(itemData) {
 }
 
 function onTradeStart(item) {
+    console.log(item.user)
     console.log(item)
+
     console.log(current_user())
+    console.log(current_user().items)
 }
 
 function getLoginForm() {
@@ -116,11 +129,12 @@ function addLoginEvent(target) {
     target.addEventListener("submit", onLoginSubmit)
 
 }
-//login submit sends a POST to sessions controller with email and pw from login form
-//session controller verifies a user with that email exists and pw is correct
-//if correct, sends back the user object and sets current_user to the corresponding
-//user
+
 function onLoginSubmit(event) {
+    //login submit sends a POST to sessions controller with email and pw from login form
+    //session controller verifies a user with that email exists and pw is correct
+    //if correct, sends back the user object and sets current_user to the corresponding
+    //user
     let email = document.getElementById("login-email").value
     let pw = document.getElementById("login-password").value
     fetch("http://localhost:3000/login", {
@@ -139,10 +153,15 @@ function onLoginSubmit(event) {
         .then(res => res.json())
         .then(res => {
             if (res.code == 200) {
+                //if credentials match up, 
+                //we use local storage to store the user Object in string form
+                //and redirect to user profile
+                //added storing current_user's items in localstorage as well
                 windowStorage.clear()
-                showUserProfile(res.user)
-                console.log(res.message)
+                showUserProfile(res)
+                console.log(res)
                 windowStorage.setItem('user', JSON.stringify(res.user))
+                windowStorage.setItem('items', JSON.stringify(res.items))
             } else {
                 alert("Invalid Credentials")
             }
@@ -152,7 +171,11 @@ function onLoginSubmit(event) {
 }
 
 function showUserProfile(user) {
-    console.log(user)
+    let mainParentDiv = document.getElementById("page-content")
+    mainParentDiv.innerHTML = ""
+
+    let userInfoCard = document.createElement("div")
+    userInfoCard.innerHTML = `<h1>${user.first_name} ${user.last_name}</h1>`
 }
 
 
