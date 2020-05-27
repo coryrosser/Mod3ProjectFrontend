@@ -108,3 +108,48 @@
     font-weight: 600;
     color: #0062cc;
 }
+
+#page-content {
+    margin-top: 0;
+    width: 100vw;
+    height: 100vh;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 0;
+}
+
+header.masthead {
+    position: relative;
+    background-color: #343a40;
+    background: url("https://bit.ly/3eo9Bv5") no-repeat center center;
+    background-size: cover;
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+    width: 100vw;
+    height: 100vh;
+}
+
+.list-group {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80vw;
+}
+
+.form-group {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50vw;
+}
+
+header.masthead .overlay {
+    position: absolute;
+    background-color: #212529;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    opacity: 0.4;
+}
+
+header.masthead h1 {
+    font-size: 6rem;
+}

@@ -19,10 +19,37 @@ let current_user = () => {
 
 let homeScreen = () => {
     console.log("at home :)")
+    let pageWrapper = document.getElementById("whole-page-wrapper")
     let mainParentDiv = document.getElementById("page-content");
     mainParentDiv.innerHTML = "";
+
+    let header = document.createElement("header")
+    header.className = "masthead text-center text-white"
+    header.innerHTML = `<div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <h1 class="mb-5">ToneDeaf Trader</h1>
+        </div>
+        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+          <form>
+            <div class="form-row justify-content-center align-items-center text-center">
+              <div class="col-12 col-md-9 mb-2 mb-md-0">
+                <h3>The best place to trade your music equipment!</h3>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>`
+    mainParentDiv.appendChild(header)
+
+
+
+
+
     let welcomeMessage = document.createElement("h1");
-    welcomeMessage.innerText = "ToneDeaf Traders";
+    welcomeMessage.innerText = "";
     welcomeMessage.setAttribute("id", "welcome-message");
     mainParentDiv.appendChild(welcomeMessage)
         //nav-bar 
@@ -35,6 +62,7 @@ let homeScreen = () => {
     if (current_user().user) {
         addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
         addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
+        addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
     }
 
 
@@ -49,6 +77,12 @@ function addNavElement(parent, elementName, elementId, callback) {
     newElement.addEventListener("click", callback)
     parent.appendChild(newElement);
 
+}
+
+function userLogout() {
+    windowStorage.setItem("user", "")
+    windowStorage.setItem("items", "")
+    homeScreen();
 }
 
 function getListings() {
@@ -67,23 +101,28 @@ function getListings() {
 function renderItems(itemData) {
     let mainParentDiv = document.getElementById("page-content");
     let itemUl = document.createElement("ul")
+    itemUl.className = "list-group"
     mainParentDiv.appendChild(itemUl)
     itemData.map((item) => {
         let itemLi = document.createElement("li")
+        itemLi.className = "list-group-item"
         itemLi.innerText = `${item.brand}: ${item.model} Trade Rating: ${item.trade_rating}`
         let tradeBtn = document.createElement("button")
         tradeBtn.innerHTML = "Trade!"
+        tradeBtn.className = "btn btn-sm btn-primary ml-5"
         itemLi.appendChild(tradeBtn)
         tradeBtn.addEventListener("click", () => onTradeStart(item));
         itemUl.appendChild(itemLi)
     })
 }
 
-  //Item Create
+//Item Create
 function getItemForm(user_id) {
     let mainParentDiv = document.getElementById("page-content");
     mainParentDiv.innerHTML = "";
-     
+    let formDiv = document.createElement("div")
+    formDiv.style = "width: 50 vw;"
+    formDiv.className = "form-group justify-content-center ml-auto mr-auto"
     let itemForm = document.createElement("form")
 
     let brandLabel = document.createElement("label")
@@ -112,7 +151,7 @@ function getItemForm(user_id) {
     finInput.name = "finish"
     finInput.type = "finish"
     finInput.id = "finish-field"
-    
+
     let descLabel = document.createElement("label")
     descLabel.htmlFor = "desc"
     descLabel.innerText = "Description: "
@@ -121,12 +160,12 @@ function getItemForm(user_id) {
     descTextArea.name = "desc"
     descTextArea.type = "desc"
     descTextArea.id = "desc-field"
-    //hidden field for current user id
+        //hidden field for current user id
     let currentUserInput = document.createElement("input")
     currentUserInput.id = "user-hidden-field"
     currentUserInput.setAttribute("type", "hidden")
     currentUserInput.value = user_id
-    
+
     let condArray = ["Poor", "Used", "Decent", "Great", "Brand New"]
     let condLabel = document.createElement("label")
     condLabel.htmlFor = "cond"
@@ -139,7 +178,7 @@ function getItemForm(user_id) {
         option.text = condArray[i];
         condList.appendChild(option);
     }
-    
+
     let valueArray = ["Under $50", "$50-$200", "$200-$500", "$500-$1500", "Over $1500"]
     let valueLabel = document.createElement("label")
     valueLabel.htmlFor = "value"
@@ -152,11 +191,17 @@ function getItemForm(user_id) {
         option.text = valueArray[i];
         valueList.appendChild(option);
     }
-    
+
     let itemSubmitBtn = document.createElement('button')
     itemSubmitBtn.innerHTML = "Submit Item"
     itemSubmitBtn.type = "submit"
-    
+    brandInput.className = "form-control"
+    modelInput.className = "form-control"
+    finInput.className = "form-control"
+    descTextArea.className = "form-control"
+    condList.className = "form-control"
+    valueList.className = "form-control"
+
     itemForm.appendChild(brandLabel)
     itemForm.appendChild(brandInput)
     itemForm.appendChild(modelLabel)
@@ -171,17 +216,18 @@ function getItemForm(user_id) {
     itemForm.appendChild(valueLabel)
     itemForm.appendChild(valueList)
     itemForm.appendChild(itemSubmitBtn)
-    
+    formDiv.appendChild(itemForm)
     addItemEvent(itemForm)
     mainParentDiv.appendChild(itemForm)
 }
 
 function addItemEvent(target) {
-    target.addEventListener("submit", (e) => { onItemSubmit() 
+    target.addEventListener("submit", (e) => {
+        onItemSubmit()
         e.preventDefault()
     })
-}   
-            
+}
+
 function onItemSubmit(e) {
     let brand = document.getElementById("brand-field").value
     let model = document.getElementById("model-field").value
@@ -190,8 +236,7 @@ function onItemSubmit(e) {
     let user_id = document.getElementById("user-hidden-field").value
     let condition = document.getElementById("cond-list").value
     let retail_value = document.getElementById("value-list").value
-    debugger;
-    
+
     fetch("http://localhost:3000/items", {
             method: 'POST',
             mode: 'cors',
@@ -211,53 +256,67 @@ function onItemSubmit(e) {
             })
         })
         .then(res => res.json())
-        .then(res => console.log(res))
+        .then(res => {
+            showUserProfile(current_user().user.id)
+            console.log(res)
+        })
 
 }
 // let email = document.getElementById("login-email").value
 // let pw = document.getElementById("login-password").value
 
-        //Trade Setup
-        function onTradeStart(item) {
-        let c = confirm("Are you sure you want to trade for this item?")
-            if (c !== false) {
-                startTrade(item);
-            }
-        }
-            
-            let tradeStatus = 0;
-        
-        function startTrade(item) {
-            let parentDiv = document.getElementById("page-content")
-            parentDiv.innerText = ""
-            let itemUl = document.createElement("ul")
-            let eligibleItems = []
-            let tradee = item.user.id
-            let tradee_item_id = item.id
-            let tradee_rating = item.trade_rating
-            let trader = current_user().user.id
-            let trader_items = current_user().items
-            trader_items.map((tradeItems) => {
-            let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
-                if (diff >= 20) {
-                    console.log("Trade not allowed")
-                } else {
-                    let itemLi = document.createElement("li")
-                    itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
-                    let tradeBtn = document.createElement("button")
-                    tradeBtn.innerHTML = "Trade!"
-                    itemLi.appendChild(tradeBtn)
-                    tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
-                    itemUl.appendChild(itemLi)
-                    eligibleItems.push(tradeItems)
-                
-                }
-            })
-            parentDiv.appendChild(itemUl)
-        }
-            
+//Trade Setup
+function onTradeStart(item) {
+    let c = confirm("Are you sure you want to trade for this item?")
+    if (c !== false) {
+        startTrade(item);
+    }
+}
 
-    function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
+let tradeStatus = 0;
+
+function startTrade(item) {
+    let parentDiv = document.getElementById("page-content")
+    parentDiv.innerText = ""
+    let itemUl = document.createElement("ul")
+    itemUl.className = "list-group"
+    let eligibleItems = []
+    let tradee = item.user.id
+    let tradee_item_id = item.id
+    let tradee_rating = item.trade_rating
+    let trader = current_user().user.id
+    let trader_items = current_user().items
+    trader_items.map((tradeItems) => {
+        let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
+        if (diff >= 20) {
+            let itemLi = document.createElement("li")
+            itemLi.className = "list-group-item"
+            itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
+            let tradeBtn = document.createElement("button")
+            tradeBtn.disabled = true
+            tradeBtn.className = "btn btn-sm btn-primary ml-5"
+            tradeBtn.innerHTML = "Not Able to Trade With This Item"
+            itemLi.appendChild(tradeBtn)
+            itemUl.appendChild(itemLi)
+        } else {
+            let itemLi = document.createElement("li")
+            itemLi.className = "list-group-item"
+            itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
+            let tradeBtn = document.createElement("button")
+            tradeBtn.className = "btn btn-sm btn-primary ml-5"
+            tradeBtn.innerHTML = "Trade!"
+            itemLi.appendChild(tradeBtn)
+            tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
+            itemUl.appendChild(itemLi)
+            eligibleItems.push(tradeItems)
+
+        }
+    })
+    parentDiv.appendChild(itemUl)
+}
+
+
+function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
     // debugger;
     fetch("http://localhost:3000/trades", {
             method: 'POST',
@@ -285,6 +344,7 @@ function getLoginForm() {
     mainParentDiv.innerHTML = "";
     //form creation 
     let loginForm = document.createElement("form")
+    loginForm.className = "form-group"
 
     let emailLabel = document.createElement("label")
     emailLabel.htmlFor = "email"
@@ -307,6 +367,9 @@ function getLoginForm() {
     let submitBtn = document.createElement('button')
     submitBtn.innerHTML = "Login"
     submitBtn.type = "submit"
+    submitBtn.className = "btn btn-primary mt-1"
+    emailInput.className = "form-control"
+    passwordInput.className = "form-control"
 
     loginForm.appendChild(emailLabel)
     loginForm.appendChild(emailInput)
@@ -355,12 +418,18 @@ function onLoginSubmit(event) {
                 console.log(res)
                 windowStorage.setItem('user', JSON.stringify(res.user))
                 windowStorage.setItem('items', JSON.stringify(res.items))
+
+                let navbarDiv = document.getElementById('nav-div')
+                addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
+                addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
+                addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
                 showUserProfile(res.user.id)
             } else {
                 alert("Invalid Credentials")
             }
 
         })
+
     event.preventDefault()
 }
 
@@ -444,18 +513,31 @@ function createUserCard(user, parent) {
     let timelineDiv = document.getElementById("timeline-content")
     let userInfoDiv = document.querySelector("div .tab-pane")
     user.items.forEach((item) => {
-        timelineDiv.innerHTML = `
-            <div class="row">
-                <div class="col-md-6">
-                    <label>${item.brand} ${item.model}</label>
-                </div>
-                <div class="col-md-6">
-                    <p>Rating: ${item.trade_rating}
-                    <button class="btn btn-sm btn-primary"id="propose-trade">Propose A Trade!</button></p>
-                    
-                </div>
-            </div>
-            `
+        let row = document.createElement("div")
+        row.className = "row mb-2"
+        row.id = `item-${item.id}`
+        let colSize = document.createElement("div")
+        colSize.className = "col-md-6"
+        colSize.innerHTML = `<label>${item.brand} ${item.model}</label>`
+        let colSize2 = document.createElement("div")
+        colSize2.className = "col-md-6 input-group"
+        let pTag = document.createElement("p")
+        pTag.className = "input-group"
+        pTag.innerText = `
+                Rating: ${ item.trade_rating }
+                `
+        let tradeButton = document.createElement("button")
+        tradeButton.className = "input-group-btn btn btn-sm btn-primary"
+        tradeButton.innerText = "Propose a Trade!"
+
+        colSize2.appendChild(pTag)
+        colSize2.appendChild(tradeButton)
+        tradeButton.addEventListener("click", () => {
+            onTradeStart(item)
+        })
+        row.append(colSize, colSize2)
+        timelineDiv.appendChild(row)
+
     })
 
     addUserInfo(user, userInfoDiv, "first_name", )
@@ -476,7 +558,9 @@ function addUserInfo(user, parent, key) {
     colDiv.appendChild(keyLabel)
     let colDiv2 = document.createElement("div")
     colDiv2.className = "col-md-6"
-    colDiv2.id = `${key}_div`
+    colDiv2.id = `
+                $ { key }
+                _div `
 
     let pTag = document.createElement("p")
     pTag.innerText = user[key]
@@ -485,7 +569,7 @@ function addUserInfo(user, parent, key) {
 
     let editBtn = document.createElement("a")
     editBtn.className = "ml-2"
-    editBtn.innerHTML = `<i class="fa fa-edit"></i>`
+    editBtn.innerHTML = ` <i class="fa fa-edit"> </i>`
 
     editBtn.addEventListener("click", () => {
         let attrEditForm = document.createElement("form")
@@ -580,18 +664,3 @@ function createUserli(user, parentNode) {
 
 
 homeScreen();
-
-
-// create_table "items", force: :cascade do |t|
-//     t.string "brand"
-//     t.string "model"
-//     t.text "description"
-//     t.integer "condition"
-//     t.integer "retail_value"
-//     t.string "finish"
-//     t.integer "trade_rating"
-//     t.bigint "user_id", null: false
-//     t.datetime "created_at", precision: 6, null: false
-//     t.datetime "updated_at", precision: 6, null: false
-//     t.index ["user_id"], name: "index_items_on_user_id"
-//   end
