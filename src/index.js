@@ -32,6 +32,9 @@ let homeScreen = () => {
     addNavElement(navbarDiv, "Home", "nav-item-home", homeScreen)
     addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
     addNavElement(navbarDiv, "Login", "nav-item-login", getLoginForm)
+    if (current_user().user) {
+        addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
+    }
 
 
 }
@@ -208,10 +211,11 @@ function onLoginSubmit(event) {
                 //and redirect to user profile
                 //added storing current_user's items in localstorage as well
                 windowStorage.clear()
-                showUserProfile(res)
+
                 console.log(res)
                 windowStorage.setItem('user', JSON.stringify(res.user))
                 windowStorage.setItem('items', JSON.stringify(res.items))
+                showUserProfile(res.user.id)
             } else {
                 alert("Invalid Credentials")
             }
@@ -220,14 +224,134 @@ function onLoginSubmit(event) {
     event.preventDefault()
 }
 
-function showUserProfile(user) {
+function showUserProfile(user_id) {
+
     let mainParentDiv = document.getElementById("page-content")
     mainParentDiv.innerHTML = ""
-
-    let userInfoCard = document.createElement("div")
-    userInfoCard.innerHTML = `<h1>${user.first_name} ${user.last_name}</h1>`
+    fetchSingleUser(user_id, mainParentDiv)
 }
 
+function createUserCard(user, parent) {
+    console.log(user)
+    let highestRatedItem = Math.max(user.items.map((item) => item.trade_rating))
+
+    parent.innerHTML = `
+	<div class="container emp-profile">
+            <form method="post">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="profile-img">
+                            <div class="file btn btn-lg btn-primary">
+                                Change Photo
+                                <input type="file" name="file"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="profile-head">
+                                    <h5>
+                                        ${user.first_name} ${user.last_name}
+                                    </h5>
+                                    <h6>
+                                        Member Since: ${new Date(user.created_at.replace(' ', 'T'))}
+                                    </h6>
+                                    <p class="proile-rating">Current Items Listed: <span>${user.items.length}</span></p>
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">About</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Items</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="profile-work">
+                            <p id="view-trade-link">View ${user.first_name}'s Past Trades</p>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                            <a href="">Trade 1</a><br/>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="tab-content profile-tab" id="myTabContent">
+                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>First Name</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>${user.first_name}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Last Name</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>${user.last_name}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Email</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>${user.email}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Location</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>${user.location}</p>
+                                            </div>
+                                        </div>
+                            </div>
+                            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                    <div id="timeline-content">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>           
+        </div>`
+    let timelineDiv = document.getElementById("timeline-content")
+    user.items.forEach((item) => {
+        timelineDiv.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <label>${item.brand} ${item.model}</label>
+                </div>
+                <div class="col-md-6">
+                    <p>Rating: ${item.trade_rating}
+                    <button class="btn btn-sm btn-primary"id="propose-trade">Propose A Trade!</button></p>
+                    
+                </div>
+            </div>
+            `
+    })
+}
+
+function fetchSingleUser(user_id, parent) {
+    fetch(`http://localhost:3000/users/${user_id}`)
+        .then(res => res.json())
+        .then(user => createUserCard(user, parent))
+}
 
 //fetch and render users
 function fetchUsers(url) {
