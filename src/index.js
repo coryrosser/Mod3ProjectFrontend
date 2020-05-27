@@ -35,7 +35,7 @@ let homeScreen = () => {
           <form>
             <div class="form-row justify-content-center align-items-center text-center">
               <div class="col-12 col-md-9 mb-2 mb-md-0">
-                <h3>The best place to trade your music equipment!</h3>
+                <h3>We can hear you!</h3>
               </div>
             </div>
           </form>
