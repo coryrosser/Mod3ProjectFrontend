@@ -75,38 +75,66 @@ function renderItems(itemData) {
     })
 }
 
-
-
-
-function onTradeStart(item) {
-    console.log(item.user)
-    console.log(item)
-
-    console.log(current_user())
-    console.log(current_user().items)
-
-    let c = confirm("Are you sure you want to trade for this item?")
-    if (c !== false) {
-        startTrade(item);
+        function onTradeStart(item) {
+        let c = confirm("Are you sure you want to trade for this item?")
+            if (c !== false) {
+                startTrade(item);
+            }
+        }
+            
+            let tradeStatus = 0;
+        
+        function startTrade(item) {
+            let parentDiv = document.getElementById("page-content")
+            parentDiv.innerText = ""
+            let itemUl = document.createElement("ul")
+            let eligibleItems = []
+            let tradee = item.user.id
+            let tradee_item_id = item.id
+            let tradee_rating = item.trade_rating
+            let trader = current_user().user.id
+            let trader_items = current_user().items
+            trader_items.map((tradeItems) => {
+            let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
+                if (diff >= 20) {
+                    console.log("Trade not allowed")
+                } else {
+                    let itemLi = document.createElement("li")
+                    itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
+                    let tradeBtn = document.createElement("button")
+                    tradeBtn.innerHTML = "Trade!"
+                    itemLi.appendChild(tradeBtn)
+                    tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
+                    itemUl.appendChild(itemLi)
+                    eligibleItems.push(tradeItems)
+                
+                }
+            })
+            parentDiv.appendChild(itemUl)
+            
+        }
+        
+    function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
+        // debugger;
+        fetch("http://localhost:3000/trades", {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                tradee_id: tradee,
+                tradee_item_id: tradee_item_id,
+                trader_id: trader,
+                trader_item_id: tradeItems
+            })
+        })
+            .then(res => res.json())
+            .then(res => console.log(res))            
     }
-
-    let tradeStatus = 0;
-
-    function startTrade(item, ) {
-        debugger;
-        let tradee = item.user_id;
-        let tradeeItemId = item.id;
-    }
-
-
-    console.log(`${tradee} is the user id number. ${tradeeItemId} is the trader item number`)
-        // console.log(item.user_id)
-        // console.log(item.brand);
-        // console.log(item.id)
-}
-
-//Trade Item Start
-
+        
 
 
 function getLoginForm() {
