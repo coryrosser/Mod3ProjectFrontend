@@ -34,6 +34,7 @@ let homeScreen = () => {
     addNavElement(navbarDiv, "Login", "nav-item-login", getLoginForm)
     if (current_user().user) {
         addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
+        addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
     }
 
 
@@ -78,46 +79,185 @@ function renderItems(itemData) {
     })
 }
 
-function onTradeStart(item) {
-    let c = confirm("Are you sure you want to trade for this item?")
-    if (c !== false) {
-        startTrade(item);
+  //Item Create
+function getItemForm(user_id) {
+    let mainParentDiv = document.getElementById("page-content");
+    mainParentDiv.innerHTML = "";
+     
+    let itemForm = document.createElement("form")
+
+    let brandLabel = document.createElement("label")
+    brandLabel.htmlFor = "brand"
+    brandLabel.innerText = "Brand: "
+
+    let brandInput = document.createElement("input")
+    brandInput.name = "brand"
+    brandInput.type = "brand"
+    brandInput.id = "brand-field"
+
+    let modelLabel = document.createElement("label")
+    modelLabel.htmlFor = "model"
+    modelLabel.innerText = "Model: "
+
+    let modelInput = document.createElement("input")
+    modelInput.name = "model"
+    modelInput.type = "model"
+    modelInput.id = "model-field"
+
+    let finLabel = document.createElement("label")
+    finLabel.htmlFor = "finish"
+    finLabel.innerText = "Finish: "
+
+    let finInput = document.createElement("input")
+    finInput.name = "finish"
+    finInput.type = "finish"
+    finInput.id = "finish-field"
+    
+    let descLabel = document.createElement("label")
+    descLabel.htmlFor = "desc"
+    descLabel.innerText = "Description: "
+
+    let descTextArea = document.createElement("TEXTAREA")
+    descTextArea.name = "desc"
+    descTextArea.type = "desc"
+    descTextArea.id = "desc-field"
+    //hidden field for current user id
+    let currentUserInput = document.createElement("input")
+    currentUserInput.id = "user-hidden-field"
+    currentUserInput.setAttribute("type", "hidden")
+    currentUserInput.value = user_id
+    
+    let condArray = ["Poor", "Used", "Decent", "Great", "Brand New"]
+    let condLabel = document.createElement("label")
+    condLabel.htmlFor = "cond"
+    condLabel.innerText = "Condition: "
+    let condList = document.createElement("select")
+    condList.id = "cond-list"
+    for (var i = 0; i < condArray.length; i++) {
+        var option = document.createElement("option");
+        option.value = i + 1;
+        option.text = condArray[i];
+        condList.appendChild(option);
     }
+    
+    let valueArray = ["Under $50", "$50-$200", "$200-$500", "$500-$1500", "Over $1500"]
+    let valueLabel = document.createElement("label")
+    valueLabel.htmlFor = "value"
+    valueLabel.innerText = "Retail Value: "
+    let valueList = document.createElement("select")
+    valueList.id = "value-list"
+    for (var i = 0; i < valueArray.length; i++) {
+        var option = document.createElement("option");
+        option.value = i + 1;
+        option.text = valueArray[i];
+        valueList.appendChild(option);
+    }
+    
+    let itemSubmitBtn = document.createElement('button')
+    itemSubmitBtn.innerHTML = "Submit Item"
+    itemSubmitBtn.type = "submit"
+    
+    itemForm.appendChild(brandLabel)
+    itemForm.appendChild(brandInput)
+    itemForm.appendChild(modelLabel)
+    itemForm.appendChild(modelInput)
+    itemForm.appendChild(finLabel)
+    itemForm.appendChild(finInput)
+    itemForm.appendChild(descLabel)
+    itemForm.appendChild(descTextArea)
+    itemForm.appendChild(currentUserInput)
+    itemForm.appendChild(condLabel)
+    itemForm.appendChild(condList)
+    itemForm.appendChild(valueLabel)
+    itemForm.appendChild(valueList)
+    itemForm.appendChild(itemSubmitBtn)
+    
+    addItemEvent(itemForm)
+    mainParentDiv.appendChild(itemForm)
 }
 
-let tradeStatus = 0;
-
-function startTrade(item) {
-    let parentDiv = document.getElementById("page-content")
-    parentDiv.innerText = ""
-    let itemUl = document.createElement("ul")
-    let eligibleItems = []
-    let tradee = item.user.id
-    let tradee_item_id = item.id
-    let tradee_rating = item.trade_rating
-    let trader = current_user().user.id
-    let trader_items = current_user().items
-    trader_items.map((tradeItems) => {
-        let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
-        if (diff >= 20) {
-            console.log("Trade not allowed")
-        } else {
-            let itemLi = document.createElement("li")
-            itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
-            let tradeBtn = document.createElement("button")
-            tradeBtn.innerHTML = "Trade!"
-            itemLi.appendChild(tradeBtn)
-            tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
-            itemUl.appendChild(itemLi)
-            eligibleItems.push(tradeItems)
-
-        }
+function addItemEvent(target) {
+    target.addEventListener("submit", (e) => { onItemSubmit() 
+        e.preventDefault()
     })
-    parentDiv.appendChild(itemUl)
+}   
+            
+function onItemSubmit(e) {
+    let brand = document.getElementById("brand-field").value
+    let model = document.getElementById("model-field").value
+    let finish = document.getElementById("finish-field").value
+    let description = document.getElementById("desc-field").value
+    let user_id = document.getElementById("user-hidden-field").value
+    let condition = document.getElementById("cond-list").value
+    let retail_value = document.getElementById("value-list").value
+    debugger;
+    
+    fetch("http://localhost:3000/items", {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                brand,
+                model,
+                finish,
+                description,
+                user_id,
+                condition,
+                retail_value,
+            })
+        })
+        .then(res => res.json())
+        .then(res => console.log(res))
 
 }
+// let email = document.getElementById("login-email").value
+// let pw = document.getElementById("login-password").value
 
-function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
+        //Trade Setup
+        function onTradeStart(item) {
+        let c = confirm("Are you sure you want to trade for this item?")
+            if (c !== false) {
+                startTrade(item);
+            }
+        }
+            
+            let tradeStatus = 0;
+        
+        function startTrade(item) {
+            let parentDiv = document.getElementById("page-content")
+            parentDiv.innerText = ""
+            let itemUl = document.createElement("ul")
+            let eligibleItems = []
+            let tradee = item.user.id
+            let tradee_item_id = item.id
+            let tradee_rating = item.trade_rating
+            let trader = current_user().user.id
+            let trader_items = current_user().items
+            trader_items.map((tradeItems) => {
+            let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
+                if (diff >= 20) {
+                    console.log("Trade not allowed")
+                } else {
+                    let itemLi = document.createElement("li")
+                    itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
+                    let tradeBtn = document.createElement("button")
+                    tradeBtn.innerHTML = "Trade!"
+                    itemLi.appendChild(tradeBtn)
+                    tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
+                    itemUl.appendChild(itemLi)
+                    eligibleItems.push(tradeItems)
+                
+                }
+            })
+            parentDiv.appendChild(itemUl)
+        }
+            
+
+    function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
     // debugger;
     fetch("http://localhost:3000/trades", {
             method: 'POST',
@@ -440,3 +580,18 @@ function createUserli(user, parentNode) {
 
 
 homeScreen();
+
+
+// create_table "items", force: :cascade do |t|
+//     t.string "brand"
+//     t.string "model"
+//     t.text "description"
+//     t.integer "condition"
+//     t.integer "retail_value"
+//     t.string "finish"
+//     t.integer "trade_rating"
+//     t.bigint "user_id", null: false
+//     t.datetime "created_at", precision: 6, null: false
+//     t.datetime "updated_at", precision: 6, null: false
+//     t.index ["user_id"], name: "index_items_on_user_id"
+//   end
