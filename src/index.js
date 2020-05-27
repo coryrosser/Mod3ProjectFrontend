@@ -221,7 +221,7 @@ function createUserCard(user, parent) {
                     <div class="col-md-6">
                         <div class="profile-head">
                                     <h5>
-                                        ${user.first_name} ${user.last_name}
+                                        ${user.first_name} ${user.last_name} 
                                     </h5>
                                     <h6>
                                         Member Since: ${new Date(user.created_at.replace(' ', 'T'))}
