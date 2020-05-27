@@ -78,54 +78,54 @@ function renderItems(itemData) {
     })
 }
 
-        function onTradeStart(item) {
-        let c = confirm("Are you sure you want to trade for this item?")
-            if (c !== false) {
-                startTrade(item);
-            }
+function onTradeStart(item) {
+    let c = confirm("Are you sure you want to trade for this item?")
+    if (c !== false) {
+        startTrade(item);
+    }
+}
+
+let tradeStatus = 0;
+
+function startTrade(item) {
+    let parentDiv = document.getElementById("page-content")
+    parentDiv.innerText = ""
+    let itemUl = document.createElement("ul")
+    let eligibleItems = []
+    let tradee = item.user.id
+    let tradee_item_id = item.id
+    let tradee_rating = item.trade_rating
+    let trader = current_user().user.id
+    let trader_items = current_user().items
+    trader_items.map((tradeItems) => {
+        let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
+        if (diff >= 20) {
+            console.log("Trade not allowed")
+        } else {
+            let itemLi = document.createElement("li")
+            itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
+            let tradeBtn = document.createElement("button")
+            tradeBtn.innerHTML = "Trade!"
+            itemLi.appendChild(tradeBtn)
+            tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
+            itemUl.appendChild(itemLi)
+            eligibleItems.push(tradeItems)
+
         }
-            
-            let tradeStatus = 0;
-        
-        function startTrade(item) {
-            let parentDiv = document.getElementById("page-content")
-            parentDiv.innerText = ""
-            let itemUl = document.createElement("ul")
-            let eligibleItems = []
-            let tradee = item.user.id
-            let tradee_item_id = item.id
-            let tradee_rating = item.trade_rating
-            let trader = current_user().user.id
-            let trader_items = current_user().items
-            trader_items.map((tradeItems) => {
-            let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
-                if (diff >= 20) {
-                    console.log("Trade not allowed")
-                } else {
-                    let itemLi = document.createElement("li")
-                    itemLi.innerText = `${tradeItems.brand}: ${tradeItems.model} Trade Rating: ${tradeItems.trade_rating}`
-                    let tradeBtn = document.createElement("button")
-                    tradeBtn.innerHTML = "Trade!"
-                    itemLi.appendChild(tradeBtn)
-                    tradeBtn.addEventListener("click", () => makeTrade(tradee, tradee_item_id, trader, tradeItems.id));
-                    itemUl.appendChild(itemLi)
-                    eligibleItems.push(tradeItems)
-                
-                }
-            })
-            parentDiv.appendChild(itemUl)
-            
-        }
-        
-    function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
-        // debugger;
-        fetch("http://localhost:3000/trades", {
+    })
+    parentDiv.appendChild(itemUl)
+
+}
+
+function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
+    // debugger;
+    fetch("http://localhost:3000/trades", {
             method: 'POST',
             mode: 'cors',
             credentials: 'same-origin',
             headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
+                "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             body: JSON.stringify({
                 tradee_id: tradee,
@@ -134,10 +134,10 @@ function renderItems(itemData) {
                 trader_item_id: tradeItems
             })
         })
-            .then(res => res.json())
-            .then(res => console.log(res))            
-    }
-        
+        .then(res => res.json())
+        .then(res => console.log(res))
+}
+
 
 
 function getLoginForm() {
@@ -286,38 +286,9 @@ function createUserCard(user, parent) {
                     <div class="col-md-8">
                         <div class="tab-content profile-tab" id="myTabContent">
                             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label>First Name</label>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <p>${user.first_name}</p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label>Last Name</label>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <p>${user.last_name}</p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label>Email</label>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <p>${user.email}</p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label>Location</label>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <p>${user.location}</p>
-                                            </div>
-                                        </div>
+                                    <div id="user-info-content">
+                                    
+                                    </div>
                             </div>
                             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                                     <div id="timeline-content">
@@ -331,6 +302,7 @@ function createUserCard(user, parent) {
             </form>           
         </div>`
     let timelineDiv = document.getElementById("timeline-content")
+    let userInfoDiv = document.querySelector("div .tab-pane")
     user.items.forEach((item) => {
         timelineDiv.innerHTML = `
             <div class="row">
@@ -345,6 +317,92 @@ function createUserCard(user, parent) {
             </div>
             `
     })
+
+    addUserInfo(user, userInfoDiv, "first_name", )
+    addUserInfo(user, userInfoDiv, "last_name")
+    addUserInfo(user, userInfoDiv, "email")
+    addUserInfo(user, userInfoDiv, "location")
+}
+
+function addUserInfo(user, parent, key) {
+    let infoRow = document.createElement("div")
+    infoRow.className = "row"
+    let colDiv = document.createElement("div")
+    colDiv.className = "col-md-6"
+    infoRow.appendChild(colDiv)
+
+    let keyLabel = document.createElement("label")
+    keyLabel.innerText = key
+    colDiv.appendChild(keyLabel)
+    let colDiv2 = document.createElement("div")
+    colDiv2.className = "col-md-6"
+    colDiv2.id = `${key}_div`
+
+    let pTag = document.createElement("p")
+    pTag.innerText = user[key]
+
+    colDiv2.appendChild(pTag)
+
+    let editBtn = document.createElement("a")
+    editBtn.className = "ml-2"
+    editBtn.innerHTML = `<i class="fa fa-edit"></i>`
+
+    editBtn.addEventListener("click", () => {
+        let attrEditForm = document.createElement("form")
+        attrEditForm.className = "form-group"
+        let attrEditField = document.createElement("input")
+        attrEditField.value = user[key]
+        attrEditField.className = "form-control col-xs-5"
+        let formDiv = document.createElement("div")
+        formDiv.className = "row"
+        formDiv.appendChild(attrEditField)
+
+        let editSubmitBtn = document.createElement("button")
+        editSubmitBtn.className = "btn btn-sm btn-success"
+        editSubmitBtn.innerText = "Confirm"
+        editSubmitBtn.type = "submit"
+        formDiv.appendChild(editSubmitBtn)
+        attrEditForm.appendChild(formDiv)
+        colDiv2.innerHTML = ""
+        colDiv2.appendChild(attrEditForm)
+        attrEditForm.addEventListener("submit", (e) => {
+            let newValue = attrEditField.value
+            editUserAttribute(user, key, newValue, infoRow)
+            e.preventDefault()
+        })
+    })
+    pTag.appendChild(editBtn)
+
+    infoRow.appendChild(colDiv2)
+    parent.appendChild(infoRow)
+}
+
+function editUserAttribute(user, key, newValue, parent) {
+    fetch(`${USERS_URL}/${user.id}`, {
+            method: 'PATCH',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                key,
+                newValue
+            })
+        })
+        .then(res => res.json())
+        .then(userData => {
+            let user = userData["user"]
+            let val = user[key]
+            let infoParent = document.getElementById(`${key}_div`)
+            addEditUserInfo(user, infoParent, val)
+        })
+}
+
+function addEditUserInfo(user, infoParent, value) {
+    infoParent.innerHTML = `<p>${value}</p>`
+
 }
 
 function fetchSingleUser(user_id, parent) {
