@@ -460,15 +460,13 @@ function getSignUpForm() {
     mainParentDiv.innerHTML = "";
     let userformDiv = document.createElement("div")
     userformDiv.style = "width: 50 vw;"
-    userformDiv.className = "form-group justify-content-center ml-auto mr-auto"
     let userSignUpForm = document.createElement("form")
     userSignUpForm.className = "form-group"
 
     let fnameLabel = document.createElement("label")
     fnameLabel.htmlFor = "first-name"
     fnameLabel.innerText = "First Name: "
-    fnameLabel.style.color = "white"
-
+    
     let fnameInput = document.createElement("input")
     fnameInput.name = "first_name"
     fnameInput.type = "first_name"
@@ -477,8 +475,7 @@ function getSignUpForm() {
     let lnameLabel = document.createElement("label")
     lnameLabel.htmlFor = "last-name"
     lnameLabel.innerText = "Last Name: "
-    lnameLabel.style.color = "white"
-
+    
     let lnameInput = document.createElement("input")
     lnameInput.name = "last_name"
     lnameInput.type = "last_name"
@@ -487,8 +484,7 @@ function getSignUpForm() {
     let userEmailLabel = document.createElement("label")
     userEmailLabel.htmlFor = "email"
     userEmailLabel.innerText = "Email: "
-    userEmailLabel.style.color = "white"
-
+    
     let userEmailInput = document.createElement("input")
     userEmailInput.name = "user-email"
     userEmailInput.type = "user-email"
@@ -497,7 +493,6 @@ function getSignUpForm() {
     let userPasswordLabel = document.createElement("label")
     userPasswordLabel.htmlFor = "user-password"
     userPasswordLabel.innerText = "Password: "
-    userPasswordLabel.style.color = "white"
 
     let userPasswordInput = document.createElement("input")
     userPasswordInput.name = "user-password"
@@ -507,7 +502,6 @@ function getSignUpForm() {
     let locationLabel = document.createElement("label")
     locationLabel.htmlFor = "location"
     locationLabel.innerText = "Location By State: "
-    locationLabel.style.color = "white"
 
     let locationInput = document.createElement("input")
     locationInput.name = "location"
@@ -517,7 +511,19 @@ function getSignUpForm() {
     let createUserSubmitBtn = document.createElement('button')
     createUserSubmitBtn.innerHTML = "Create User"
     createUserSubmitBtn.type = "submit"
-
+    
+    fnameInput.className = "form-control"
+    lnameInput.className = "form-control"
+    userEmailInput.className = "form-control"
+    userPasswordInput.className = "form-control"
+    locationInput.className = "form-control"
+    createUserSubmitBtn.className = "btn btn-primary btn-block mt-3"
+    fnameLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    lnameLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    userEmailLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    userPasswordLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    locationLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    
     userSignUpForm.appendChild(fnameLabel)
     userSignUpForm.appendChild(fnameInput)
     userSignUpForm.appendChild(lnameLabel)
@@ -529,12 +535,15 @@ function getSignUpForm() {
     userSignUpForm.appendChild(locationLabel)
     userSignUpForm.appendChild(locationInput)
     userSignUpForm.appendChild(createUserSubmitBtn)
-
     userformDiv.appendChild(userSignUpForm)
-
+    
     addCreateUserEvent(userSignUpForm)
-
+    
+    userformDiv.className = "form-group justify-content-center ml-auto mr-auto"
+    userSignUpForm.className = "form-group justify-content-center ml-auto mr-auto"
+    
     mainParentDiv.appendChild(userSignUpForm)
+    
 }
 
 function addCreateUserEvent(target) {
@@ -546,7 +555,7 @@ function addCreateUserEvent(target) {
 
 
 function createUser() {
-    debugger;
+    // debugger;
     let first_name = document.getElementById("user-first-name").value
     let last_name = document.getElementById("user-last-name").value
     let email = document.getElementById("user-email-input").value
@@ -569,9 +578,25 @@ function createUser() {
             })
         })
         .then(res => res.json())
-        .then(res => console.log(res))
-}
+        .then(res => {
+            
+            windowStorage.clear()
 
+            console.log(res)
+            windowStorage.setItem('user', JSON.stringify(res))
+            windowStorage.setItem('items', JSON.stringify(res.items))
+            let navbarDiv = document.getElementById('nav-div')
+                addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
+                addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
+                addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
+                showUserProfile(res.user.id)
+                addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
+            showUserProfile(res.id)
+            console.log(res)
+        })
+
+        }
+        
 function getLoginForm() {
     let mainParentDiv = document.getElementById("page-content");
     mainParentDiv.innerHTML = "";
