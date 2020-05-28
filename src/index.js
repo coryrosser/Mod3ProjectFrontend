@@ -381,7 +381,7 @@ function renderTradeInfo(users, trade, user, i) {
         tradeLi.appendChild(btnGroup)
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
-    } else if (user.id == trade.tradee_id && trade.status != 3) {
+    } else if (user.id == trade.tradee_id && trade.status == 2) {
         let pendingTrade = document.getElementById("trade-ul")
         let tradeLi = document.createElement("li")
         tradeLi.className = "list-group-item"
@@ -390,7 +390,7 @@ function renderTradeInfo(users, trade, user, i) {
 
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
-    } else if (user.id == trade.trader_id && trade.status != 3) {
+    } else if (user.id == trade.trader_id && trade.status == 2) {
         let pendingTrade = document.getElementById("trade-ul")
         let tradeLi = document.createElement("li")
         tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
@@ -544,7 +544,7 @@ function addCreateUserEvent(target) {
 
 
 function createUser() {
-    debugger;
+    // debugger;
     let first_name = document.getElementById("user-first-name").value
     let last_name = document.getElementById("user-last-name").value
     let email = document.getElementById("user-email-input").value
@@ -743,7 +743,8 @@ function createUserCard(user, parent) {
                     </div>
                 </div>
             </form>           
-        </div>`
+            </div>`
+            
     let timelineDiv = document.getElementById("timeline-content")
     let userInfoDiv = document.querySelector("div .tab-pane")
     user.items.forEach((item) => {
@@ -768,12 +769,11 @@ function createUserCard(user, parent) {
         colSize2.appendChild(tradeButton)
         row.append(colSize, colSize2)
         timelineDiv.appendChild(row)
-        getTrades(user)
         tradeButton.addEventListener("click", () => {
             onTradeStart(item)
         })
     })
-
+    getTrades(user)
     addUserInfo(user, userInfoDiv, "first_name", )
     addUserInfo(user, userInfoDiv, "last_name")
     addUserInfo(user, userInfoDiv, "email")
