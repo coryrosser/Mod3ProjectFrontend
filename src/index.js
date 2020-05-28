@@ -255,7 +255,7 @@ function onItemSubmit(e) {
                 condition,
                 retail_value,
             })
-        })
+    })
         .then(res => res.json())
         .then(res => {
             showUserProfile(current_user().user.id)
@@ -263,8 +263,7 @@ function onItemSubmit(e) {
         })
 
 }
-// let email = document.getElementById("login-email").value
-// let pw = document.getElementById("login-password").value
+
 
 //Trade Setup
 function onTradeStart(item) {
@@ -785,3 +784,7 @@ function createUserli(user, parentNode) {
 
 
 homeScreen();
+
+
+
+ 
