@@ -53,10 +53,10 @@ let homeScreen = () => {
     navbarDiv.innerHTML = ""
         //adds nav element. takes in parent node, nav name, nav id, callback for event
     addNavElement(navbarDiv, "Home", "nav-item-home", homeScreen)
-    addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
     addNavElement(navbarDiv, "Login", "nav-item-login", getLoginForm)
     addNavElement(navbarDiv, "Sign Up", "nav-item-signup", getSignUpForm)
     if (current_user().user) {
+        addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
         addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
         addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
         addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
@@ -352,10 +352,11 @@ function retrieveUserInfoForTrade(user, trade) {
         })
 }
 
-function renderTradeInfo(users, trade, user, i) {
+function renderTradeInfo(users, trade, user) {
     let tradeList = document.getElementById("panel-body")
-    if (user.id == trade.tradee_id && trade.status == 0) {
-        let pendingTrade = document.getElementById("trade-ul")
+    let pendingTrade = document.getElementById("trade-ul")
+    if (user.id === trade.tradee_id && trade.status === 0) {
+        console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.style = "background-color: rgb(255,213,0, 0.5);"
         tradeLi.className = "list-group-item"
@@ -368,13 +369,13 @@ function renderTradeInfo(users, trade, user, i) {
         approveBtn.className = "btn btn-sm btn-success"
         approveBtn.addEventListener("click", () => {
             tradeLi.remove()
-            updateTrade(trade, 2)
+            updateTrade(user, trade, 2)
         })
         let denyBtn = document.createElement("button")
         denyBtn.innerText = "Deny"
         denyBtn.addEventListener("click", () => {
             tradeLi.remove()
-            updateTrade(trade, 3)
+            updateTrade(user, trade, 3)
         })
         denyBtn.className = "btn btn-sm btn-danger"
         btnGroup.append(approveBtn, denyBtn)
@@ -382,8 +383,8 @@ function renderTradeInfo(users, trade, user, i) {
         tradeLi.appendChild(btnGroup)
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
-    } else if (user.id == trade.tradee_id && trade.status != 3) {
-        let pendingTrade = document.getElementById("trade-ul")
+    } else if (user.id === trade.tradee_id && trade.status === 2) {
+        console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.className = "list-group-item"
         tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
@@ -391,8 +392,8 @@ function renderTradeInfo(users, trade, user, i) {
 
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
-    } else if (user.id == trade.trader_id && trade.status != 3) {
-        let pendingTrade = document.getElementById("trade-ul")
+    } else if (user.id == trade.trader_id && trade.status == 2) {
+        console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
         tradeLi.className = "list-group-item"
@@ -404,7 +405,7 @@ function renderTradeInfo(users, trade, user, i) {
 
 }
 
-function updateTrade(trade, status) {
+function updateTrade(user, trade, status) {
     fetch(`http://localhost:3000/trades/${trade.id}`, {
             method: 'PATCH',
             mode: 'cors',
@@ -421,7 +422,8 @@ function updateTrade(trade, status) {
         .then(res => {
             console.log(res)
             if (status == 2) {
-                renderTradeInfo(trade)
+
+                retrieveUserInfoForTrade(user, res.trade)
             }
         })
 
@@ -660,6 +662,7 @@ function onLoginSubmit(event) {
                 addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
                 addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
                 showUserProfile(res.user.id)
+                addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
             } else {
                 alert("Invalid Credentials")
             }
@@ -769,11 +772,12 @@ function createUserCard(user, parent) {
         colSize2.appendChild(tradeButton)
         row.append(colSize, colSize2)
         timelineDiv.appendChild(row)
-        getTrades(user)
         tradeButton.addEventListener("click", () => {
             onTradeStart(item)
         })
     })
+
+    getTrades(user)
 
     addUserInfo(user, userInfoDiv, "first_name", )
     addUserInfo(user, userInfoDiv, "last_name")
