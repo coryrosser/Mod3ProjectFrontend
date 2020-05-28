@@ -1,9 +1,33 @@
+.btn-primary {
+    color: #212529 !important;
+    background-color: #FFD500 !important;
+    border-color: #e7d363 !important;
+}
+
+body {
+    background-color: #212529 !important;
+}
+
 .emp-profile {
     padding: 3%;
     margin-top: 3%;
     margin-bottom: 3%;
     border-radius: 0.5rem;
     background: #fff;
+}
+
+.form-group {
+    margin-top: 10vh;
+}
+
+#nav-div {
+    background-color: #111;
+    margin-bottom: 0;
+    border-bottom-color: #FFD500;
+}
+
+#nav-div a {
+    color: #FFD500;
 }
 
 .profile-img {

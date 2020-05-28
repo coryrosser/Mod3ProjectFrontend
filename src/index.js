@@ -35,7 +35,7 @@ let homeScreen = () => {
           <form>
             <div class="form-row justify-content-center align-items-center text-center">
               <div class="col-12 col-md-9 mb-2 mb-md-0">
-                <h3>We can hear you!</h3>
+                <h3 style='color: #FFD500;'>We can hear you!</h3>
               </div>
             </div>
           </form>
@@ -43,10 +43,6 @@ let homeScreen = () => {
       </div>
     </div>`
     mainParentDiv.appendChild(header)
-
-
-
-
 
     let welcomeMessage = document.createElement("h1");
     welcomeMessage.innerText = "";
@@ -88,7 +84,10 @@ function userLogout() {
 function getListings() {
     let mainParentDiv = document.getElementById("page-content");
     mainParentDiv.innerHTML = "";
-    //using items url for now. will change when we have listings
+    let overlay = document.createElement("div")
+    document.querySelector("body").appendChild(overlay)
+    overlay.className = "overlay"
+        //using items url for now. will change when we have listings
     let listingsUrl = "http://localhost:3000/items"
     fetch(listingsUrl)
         .then(res => res.json())
@@ -110,6 +109,14 @@ function renderItems(itemData) {
         let tradeBtn = document.createElement("button")
         tradeBtn.innerHTML = "Trade!"
         tradeBtn.className = "btn btn-sm btn-primary ml-5"
+        let itemUser = document.createElement("a")
+        itemUser.href = "#Profile"
+        itemUser.addEventListener("click", () => {
+            showUserProfile(item.user.id)
+        })
+        itemUser.className = "ml-2"
+        itemUser.innerText = `Owner: ${item.user.first_name} ${item.user.last_name}`
+        itemLi.appendChild(itemUser)
         itemLi.appendChild(tradeBtn)
         tradeBtn.addEventListener("click", () => onTradeStart(item));
         itemUl.appendChild(itemLi)
@@ -121,8 +128,6 @@ function getItemForm(user_id) {
     let mainParentDiv = document.getElementById("page-content");
     mainParentDiv.innerHTML = "";
     let formDiv = document.createElement("div")
-    formDiv.style = "width: 50 vw;"
-    formDiv.className = "form-group justify-content-center ml-auto mr-auto"
     let itemForm = document.createElement("form")
 
     let brandLabel = document.createElement("label")
@@ -201,6 +206,13 @@ function getItemForm(user_id) {
     descTextArea.className = "form-control"
     condList.className = "form-control"
     valueList.className = "form-control"
+    itemSubmitBtn.className = "btn btn-primary btn-block mt-3"
+    brandLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    modelLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    finLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    descLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    condLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    valueLabel.style = "color: #EEEEEE; font-size: 1rem;"
 
     itemForm.appendChild(brandLabel)
     itemForm.appendChild(brandInput)
@@ -218,6 +230,10 @@ function getItemForm(user_id) {
     itemForm.appendChild(itemSubmitBtn)
     formDiv.appendChild(itemForm)
     addItemEvent(itemForm)
+    formDiv.className = "form-group justify-content-center ml-auto mr-auto"
+
+    itemForm.className = "form-group justify-content-center ml-auto mr-auto"
+
     mainParentDiv.appendChild(itemForm)
 }
 
@@ -315,6 +331,101 @@ function startTrade(item) {
     parentDiv.appendChild(itemUl)
 }
 
+function getTrades(user) {
+    fetch(`http://localhost:3000/trades`)
+        .then(res => res.json())
+        .then(trades => {
+            console.log(trades)
+            trades.map((trade) => {
+                retrieveUserInfoForTrade(user, trade)
+
+            })
+        })
+}
+
+function retrieveUserInfoForTrade(user, trade) {
+    fetch(`http://localhost:3000/users`)
+        .then(res => res.json())
+        .then(users => {
+            renderTradeInfo(users, trade, user)
+        })
+}
+
+function renderTradeInfo(users, trade, user, i) {
+    let tradeList = document.getElementById("panel-body")
+    if (user.id == trade.tradee_id && trade.status == 0) {
+        let pendingTrade = document.getElementById("trade-ul")
+        let tradeLi = document.createElement("li")
+        tradeLi.style = "background-color: rgb(255,213,0, 0.5);"
+        tradeLi.className = "list-group-item"
+        tradeLi.innerText = ` Pending Trade From: ${users.find(user => user.id  === trade.trader_id).first_name}`
+        let btnGroup = document.createElement("div")
+        btnGroup.className = "btn-group-sm"
+
+        let approveBtn = document.createElement("button")
+        approveBtn.innerText = "Approve"
+        approveBtn.className = "btn btn-sm btn-success"
+        approveBtn.addEventListener("click", () => {
+            tradeLi.remove()
+            updateTrade(trade, 2)
+        })
+        let denyBtn = document.createElement("button")
+        denyBtn.innerText = "Deny"
+        denyBtn.addEventListener("click", () => {
+            tradeLi.remove()
+            updateTrade(trade, 3)
+        })
+        denyBtn.className = "btn btn-sm btn-danger"
+        btnGroup.append(approveBtn, denyBtn)
+
+        tradeLi.appendChild(btnGroup)
+        pendingTrade.appendChild(tradeLi)
+        tradeList.appendChild(pendingTrade)
+    } else if (user.id == trade.tradee_id && trade.status != 3) {
+        let pendingTrade = document.getElementById("trade-ul")
+        let tradeLi = document.createElement("li")
+        tradeLi.className = "list-group-item"
+        tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
+        tradeLi.innerText = ` Traded With: ${users.find(user => user.id  === trade.trader_id).first_name}`
+
+        pendingTrade.appendChild(tradeLi)
+        tradeList.appendChild(pendingTrade)
+    } else if (user.id == trade.trader_id && trade.status != 3) {
+        let pendingTrade = document.getElementById("trade-ul")
+        let tradeLi = document.createElement("li")
+        tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
+        tradeLi.className = "list-group-item"
+        tradeLi.innerText = ` Traded With: ${users.find(user => user.id  === trade.tradee_id).first_name}`
+
+        pendingTrade.appendChild(tradeLi)
+        tradeList.appendChild(pendingTrade)
+    }
+
+}
+
+function updateTrade(trade, status) {
+    fetch(`http://localhost:3000/trades/${trade.id}`, {
+            method: 'PATCH',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                status: status
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log(res)
+            if (status == 2) {
+                renderTradeInfo(trade)
+            }
+        })
+
+}
+
 
 function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
     // debugger;
@@ -333,8 +444,12 @@ function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
                 trader_item_id: tradeItems
             })
         })
-        .then(res => res.json())
-        .then(res => console.log(res))
+        .then(res => {
+            res.json()
+
+            showUserProfile(current_user().user.id)
+        })
+
 }
 
 
@@ -442,10 +557,9 @@ function showUserProfile(user_id) {
 
 function createUserCard(user, parent) {
     console.log(user)
-    let highestRatedItem = Math.max(user.items.map((item) => item.trade_rating))
-
+    parent.className = "container ml-auto mr-auto"
     parent.innerHTML = `
-	<div class="container emp-profile">
+	<div class="container emp-profile ">
             <form method="post">
                 <div class="row">
                     <div class="col-md-4">
@@ -481,15 +595,15 @@ function createUserCard(user, parent) {
                 <div class="row">
                     <div class="col-md-4">
                         <div class="profile-work">
-                            <p id="view-trade-link">View ${user.first_name}'s Past Trades</p>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
-                            <a href="">Trade 1</a><br/>
+                        <div class="panel panel-primary">
+                            <div id="view-trade-link" class="panel-heading">
+                                <h5 class="panel-title">View ${user.first_name}'s Past Trades</h5>
+                            </div>
+                            <div class="panel-body" id="panel-body"></div>
+                            <ul id="trade-ul"class="list-group overflow-auto" style="max-height: 30vh; max-width: 22vw; margin-bottom: 10px;">
+                            </ul>
+
+                        </div>
                         </div>
                     </div>
                     <div class="col-md-8">
@@ -532,12 +646,12 @@ function createUserCard(user, parent) {
 
         colSize2.appendChild(pTag)
         colSize2.appendChild(tradeButton)
+        row.append(colSize, colSize2)
+        timelineDiv.appendChild(row)
+        getTrades(user)
         tradeButton.addEventListener("click", () => {
             onTradeStart(item)
         })
-        row.append(colSize, colSize2)
-        timelineDiv.appendChild(row)
-
     })
 
     addUserInfo(user, userInfoDiv, "first_name", )
