@@ -56,6 +56,7 @@ let homeScreen = () => {
     addNavElement(navbarDiv, "Login", "nav-item-login", getLoginForm)
     addNavElement(navbarDiv, "Sign Up", "nav-item-signup", getSignUpForm)
     if (current_user().user) {
+        navOnLogin()
         addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
         addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
         addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
@@ -518,7 +519,17 @@ function getSignUpForm() {
     let createUserSubmitBtn = document.createElement('button')
     createUserSubmitBtn.innerHTML = "Create User"
     createUserSubmitBtn.type = "submit"
-
+    fnameInput.className = "form-control"
+    lnameInput.className = "form-control"
+    userEmailInput.className = "form-control"
+    userPasswordInput.className = "form-control"
+    locationInput.className = "form-control"
+    createUserSubmitBtn.className = "btn btn-primary btn-block mt-3"
+    fnameLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    lnameLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    userEmailLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    userPasswordLabel.style = "color: #EEEEEE; font-size: 1rem;"
+    locationLabel.style = "color: #EEEEEE; font-size: 1rem;"
     userSignUpForm.appendChild(fnameLabel)
     userSignUpForm.appendChild(fnameInput)
     userSignUpForm.appendChild(lnameLabel)
@@ -530,7 +541,8 @@ function getSignUpForm() {
     userSignUpForm.appendChild(locationLabel)
     userSignUpForm.appendChild(locationInput)
     userSignUpForm.appendChild(createUserSubmitBtn)
-
+    userformDiv.className = "form-group justify-content-center ml-auto mr-auto"
+    userSignUpForm.className = "form-group justify-content-center ml-auto mr-auto"
     userformDiv.appendChild(userSignUpForm)
 
     addCreateUserEvent(userSignUpForm)
@@ -547,7 +559,6 @@ function addCreateUserEvent(target) {
 
 
 function createUser() {
-    debugger;
     let first_name = document.getElementById("user-first-name").value
     let last_name = document.getElementById("user-last-name").value
     let email = document.getElementById("user-email-input").value
@@ -570,7 +581,24 @@ function createUser() {
             })
         })
         .then(res => res.json())
-        .then(res => console.log(res))
+        .then(res => {
+            console.log(res)
+            windowStorage.clear()
+            windowStorage.setItem('user', JSON.stringify(res))
+            windowStorage.setItem('items', JSON.stringify(res.items))
+            navOnLogin()
+            let navbarDiv = document.getElementById("nav-div")
+            addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
+            addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
+            addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
+            addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
+            showUserProfile(res.id)
+        })
+}
+
+function navOnLogin() {
+    document.getElementById("nav-item-login").remove()
+    document.getElementById("nav-item-signup").remove()
 }
 
 function getLoginForm() {
@@ -656,7 +684,7 @@ function onLoginSubmit(event) {
                 console.log(res)
                 windowStorage.setItem('user', JSON.stringify(res.user))
                 windowStorage.setItem('items', JSON.stringify(res.items))
-
+                navOnLogin()
                 let navbarDiv = document.getElementById('nav-div')
                 addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
                 addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
