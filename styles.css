@@ -177,3 +177,27 @@ header.masthead .overlay {
 header.masthead h1 {
     font-size: 6rem;
 }
+
+#nav-div {
+    background-color: #242424;
+    margin-bottom: 0;
+    border-bottom-color: #FFD500;
+}
+#nav-div a {
+    color: #FFD500;
+}
+
+.btn-primary {
+    color: #212529 !important;
+    background-color: #FFD500 !important;
+    border-color: #E7D363 !important;
+}
+
+body {
+    background-color: #222222 !important;
+    
+}
+
+.form-control {
+    width: 40vw !important;
+}

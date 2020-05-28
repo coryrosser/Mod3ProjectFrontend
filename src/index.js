@@ -35,7 +35,7 @@ let homeScreen = () => {
           <form>
             <div class="form-row justify-content-center align-items-center text-center">
               <div class="col-12 col-md-9 mb-2 mb-md-0">
-                <h3 style='color: #FFD500;'>We can hear you!</h3>
+                <h3 style = "color: #FFD500;">We can hear you!</h3>
               </div>
             </div>
           </form>
@@ -55,6 +55,7 @@ let homeScreen = () => {
     addNavElement(navbarDiv, "Home", "nav-item-home", homeScreen)
     addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
     addNavElement(navbarDiv, "Login", "nav-item-login", getLoginForm)
+    addNavElement(navbarDiv, "Sign Up", "nav-item-signup", getSignUpForm)
     if (current_user().user) {
         addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
         addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
@@ -452,7 +453,123 @@ function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
 
 }
 
+//Create User
+function getSignUpForm() {
+    let mainParentDiv = document.getElementById("page-content");
+    mainParentDiv.innerHTML = "";
+    let userformDiv = document.createElement("div")
+    userformDiv.style = "width: 50 vw;"
+    userformDiv.className = "form-group justify-content-center ml-auto mr-auto"
+    let userSignUpForm = document.createElement("form")
+    userSignUpForm.className = "form-group"
 
+    let fnameLabel = document.createElement("label")
+    fnameLabel.htmlFor = "first-name"
+    fnameLabel.innerText = "First Name: "
+    fnameLabel.style.color = "white"
+
+    let fnameInput = document.createElement("input")
+    fnameInput.name = "first_name"
+    fnameInput.type = "first_name"
+    fnameInput.id = "user-first-name"
+
+    let lnameLabel = document.createElement("label")
+    lnameLabel.htmlFor = "last-name"
+    lnameLabel.innerText = "Last Name: "
+    lnameLabel.style.color = "white"
+
+    let lnameInput = document.createElement("input")
+    lnameInput.name = "last_name"
+    lnameInput.type = "last_name"
+    lnameInput.id = "user-last-name"
+
+    let userEmailLabel = document.createElement("label")
+    userEmailLabel.htmlFor = "email"
+    userEmailLabel.innerText = "Email: "
+    userEmailLabel.style.color = "white"
+
+    let userEmailInput = document.createElement("input")
+    userEmailInput.name = "user-email"
+    userEmailInput.type = "user-email"
+    userEmailInput.id = "user-email-input"
+
+    let userPasswordLabel = document.createElement("label")
+    userPasswordLabel.htmlFor = "user-password"
+    userPasswordLabel.innerText = "Password: "
+    userPasswordLabel.style.color = "white"
+
+    let userPasswordInput = document.createElement("input")
+    userPasswordInput.name = "user-password"
+    userPasswordInput.type = "user-password"
+    userPasswordInput.id = "user-password-input"
+
+    let locationLabel = document.createElement("label")
+    locationLabel.htmlFor = "location"
+    locationLabel.innerText = "Location By State: "
+    locationLabel.style.color = "white"
+
+    let locationInput = document.createElement("input")
+    locationInput.name = "location"
+    locationInput.type = "location"
+    locationInput.id = "location-input"
+
+    let createUserSubmitBtn = document.createElement('button')
+    createUserSubmitBtn.innerHTML = "Create User"
+    createUserSubmitBtn.type = "submit"
+
+    userSignUpForm.appendChild(fnameLabel)
+    userSignUpForm.appendChild(fnameInput)
+    userSignUpForm.appendChild(lnameLabel)
+    userSignUpForm.appendChild(lnameInput)
+    userSignUpForm.appendChild(userEmailLabel)
+    userSignUpForm.appendChild(userEmailInput)
+    userSignUpForm.appendChild(userPasswordLabel)
+    userSignUpForm.appendChild(userPasswordInput)
+    userSignUpForm.appendChild(locationLabel)
+    userSignUpForm.appendChild(locationInput)
+    userSignUpForm.appendChild(createUserSubmitBtn)
+
+    userformDiv.appendChild(userSignUpForm)
+
+    addCreateUserEvent(userSignUpForm)
+
+    mainParentDiv.appendChild(userSignUpForm)
+}
+
+function addCreateUserEvent(target) {
+    target.addEventListener("submit", (e) => {
+        createUser()
+        e.preventDefault();
+    })
+}
+
+
+function createUser() {
+    debugger;
+    let first_name = document.getElementById("user-first-name").value
+    let last_name = document.getElementById("user-last-name").value
+    let email = document.getElementById("user-email-input").value
+    let password = document.getElementById("user-password-input").value
+    let location = document.getElementById("location-input").value
+    fetch("http://localhost:3000/users", {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                first_name,
+                last_name,
+                email,
+                password,
+                location
+            })
+        })
+        .then(res => res.json())
+        .then(res => console.log(res))
+}
 
 function getLoginForm() {
     let mainParentDiv = document.getElementById("page-content");
@@ -464,20 +581,24 @@ function getLoginForm() {
     let emailLabel = document.createElement("label")
     emailLabel.htmlFor = "email"
     emailLabel.innerText = "Email: "
+    emailLabel.style.color = "white"
 
     let emailInput = document.createElement("input")
     emailInput.name = "email"
     emailInput.type = "email"
     emailInput.id = "login-email"
+    emailInput.align = "center"
 
     let passwordLabel = document.createElement("label")
     passwordLabel.htmlFor = "password"
     passwordLabel.innerText = "Password: "
+    passwordLabel.style.color = "white"
 
     let passwordInput = document.createElement("input")
     passwordInput.name = "password"
     passwordInput.type = "password"
     passwordInput.id = "login-password"
+    passwordInput.align = "center"
 
     let submitBtn = document.createElement('button')
     submitBtn.innerHTML = "Login"
