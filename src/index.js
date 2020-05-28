@@ -792,16 +792,23 @@ function createUserCard(user, parent) {
         pTag.innerText = `
                 Rating: ${ item.trade_rating }
                 `
-        let tradeButton = document.createElement("button")
-        tradeButton.className = "input-group-btn btn btn-sm btn-primary"
-        tradeButton.innerText = "Propose a Trade!"
+        let removeItemButton = document.createElement("button")
+        removeItemButton.className = "input-group-btn btn btn-sm btn-primary"
+        removeItemButton.innerText = "Remove Item"
 
         colSize2.appendChild(pTag)
-        colSize2.appendChild(tradeButton)
+        colSize2.appendChild(removeItemButton)
         row.append(colSize, colSize2)
         timelineDiv.appendChild(row)
-        tradeButton.addEventListener("click", () => {
-            onTradeStart(item)
+        removeItemButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            let c = confirm("Are you sure you want to remove this item?")
+            if (c !== false) {
+                colSize.remove();
+                colSize2.remove();
+                
+                removeItem(item);
+            }
         })
     })
 
@@ -812,6 +819,26 @@ function createUserCard(user, parent) {
     addUserInfo(user, userInfoDiv, "email")
     addUserInfo(user, userInfoDiv, "location")
 }
+
+function removeItem(item) {
+    // debugger;
+    fetch(`http://localhost:3000/items/${item.id}`, {
+            method: 'DELETE',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                item
+            })
+        })
+        .then(res => res.json())
+        .then(res => console.log(res))
+}
+
+
 
 function addUserInfo(user, parent, key) {
     let infoRow = document.createElement("div")
