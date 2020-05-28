@@ -21,6 +21,7 @@ body {
 }
 
 #nav-div {
+    margin-top: 0rem;
     background-color: #111;
     margin-bottom: 0;
     border-bottom-color: #FFD500;
@@ -137,8 +138,8 @@ body {
     margin-top: 0;
     width: 100vw;
     height: 100vh;
-    margin-left: 0;
-    margin-right: auto;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     padding: 0;
 }
 
@@ -151,6 +152,7 @@ header.masthead {
     padding-bottom: 8rem;
     width: 100vw;
     height: 100vh;
+    margin-left: 0;
 }
 
 .list-group {
@@ -183,6 +185,7 @@ header.masthead h1 {
     margin-bottom: 0;
     border-bottom-color: #FFD500;
 }
+
 #nav-div a {
     color: #FFD500;
 }
@@ -195,7 +198,6 @@ header.masthead h1 {
 
 body {
     background-color: #222222 !important;
-    
 }
 
 .form-control {
