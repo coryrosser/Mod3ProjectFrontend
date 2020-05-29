@@ -883,12 +883,15 @@ function addUserInfo(user, parent, key) {
 
         editBtn.addEventListener("click", () => {
             let attrEditForm = document.createElement("form")
-            attrEditForm.className = "form-group"
+            attrEditForm.className = ""
+            attrEditForm.style = "max-height: 5vh;"
             let attrEditField = document.createElement("input")
             attrEditField.value = user[key]
-            attrEditField.className = "form-control col-xs-5"
+            attrEditField.className = ""
+            attrEditField.style = "max-width: 15vw;"
             let formDiv = document.createElement("div")
-            formDiv.className = "row"
+            formDiv.className = ""
+            formDiv.style = "margin-top: 0;"
             formDiv.appendChild(attrEditField)
 
             let editSubmitBtn = document.createElement("button")
@@ -899,8 +902,10 @@ function addUserInfo(user, parent, key) {
             attrEditForm.appendChild(formDiv)
             colDiv2.innerHTML = ""
             colDiv2.appendChild(attrEditForm)
+            colDiv2.style = "max-height: 5vh;"
             attrEditForm.addEventListener("submit", (e) => {
                 let newValue = attrEditField.value
+                colDiv2.innerText = newValue
                 editUserAttribute(user, key, newValue, infoRow)
                 e.preventDefault()
             })
@@ -926,18 +931,18 @@ function editUserAttribute(user, key, newValue, parent) {
             })
         })
         .then(res => res.json())
-        .then(userData => {
-            let user = userData["user"]
-            let val = user[key]
-            let infoParent = document.getElementById(`${key}_div`)
-            addEditUserInfo(user, infoParent, val)
-        })
+        // .then(userData => {
+        //     // let user = userData["user"]
+        //     // let val = user[key]
+        //     // let infoParent = document.getElementById(`${key}_div`)
+        //     // addEditUserInfo(user, infoParent, val)
+        // })
 }
 
-function addEditUserInfo(user, infoParent, value) {
-    infoParent.innerHTML = `<p>${value}</p>`
+// function addEditUserInfo(user, infoParent, value) {
+//     infoParent.innerHTML = `<p>${value}</p>`
 
-}
+// }
 
 function fetchSingleUser(user_id, parent) {
     fetch(`http://localhost:3000/users/${user_id}`)
