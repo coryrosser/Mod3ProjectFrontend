@@ -730,6 +730,7 @@ function createUserCard(user, parent) {
                 <div class="row">
                     <div class="col-md-4">
                         <div class="profile-img">
+                        <img src="https://picsum.photos/200"/>
                             <div class="file btn btn-lg btn-primary">
                                 Change Photo
                                 <input type="file" name="file"/>
