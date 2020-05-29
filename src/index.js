@@ -2,20 +2,23 @@ const USERS_URL = "http://localhost:3000/users"
 
 const windowStorage = window.localStorage
 
+//commented code locations may be a few lines off bc of added comments. if the function isnt right where the comment points it should be close
+
 let current_user = () => {
-    //Once logged in a users object is set in local storage by using JSON.stringify
-    // this function retrives that user and parses it to convert back to obj form
-    //using this function should always return an object that can be used as any other.
-    //eg. current_user().first_name >> "Cory", "Joey" etc
+        //Once logged in a users object is set in local storage by using JSON.stringify
+        // this function retrives that user and parses it to convert back to obj form
+        //using this function should always return an object that can be used as any other.
+        //eg. current_user().first_name >> "Cory", "Joey" etc
 
-    //see onLoginSubmit for how the obj is stored
-    let userData = {
-        user: JSON.parse(windowStorage.getItem('user')),
-        items: JSON.parse(windowStorage.getItem('items'))
+        //see onLoginSubmit for how the obj is stored
+        //planned to refactor and use integer only here but time was not on my side.
+        let userData = {
+            user: JSON.parse(windowStorage.getItem('user')),
+            items: JSON.parse(windowStorage.getItem('items'))
+        }
+        return userData
     }
-    return userData
-}
-
+    //this func is ran on page load. only loads landing screen and adds nav elements. can log in or sign up.
 let homeScreen = () => {
     console.log("at home :)")
     let pageWrapper = document.getElementById("whole-page-wrapper")
@@ -50,11 +53,13 @@ let homeScreen = () => {
         //nav-bar 
     let navbarDiv = document.getElementById('nav-div')
     navbarDiv.innerHTML = ""
-        //adds nav element. takes in parent node, nav name, nav id, callback for event
+        //adds nav element. takes in parent node, nav name, nav id, callback for event look at line 68 for reference
     addNavElement(navbarDiv, "Home", "nav-item-home", homeScreen)
     addNavElement(navbarDiv, "Login", "nav-item-login", getLoginForm)
     addNavElement(navbarDiv, "Sign Up", "nav-item-signup", getSignUpForm)
+        //user will only see the links below if logged in. checks to see if localStorage has anything in "user" key
     if (current_user().user) {
+        //navOnLogin removes login and sign up nav elements once a user is logged in see line 617
         navOnLogin()
         addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
         addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
@@ -75,8 +80,9 @@ function addNavElement(parent, elementName, elementId, callback) {
     parent.appendChild(newElement);
 
 }
-
+//user logout is a call back passed into addSavElement for our logout nav. sets localStorage keys to empty screen and calls homeScreen()
 function userLogout() {
+
     windowStorage.setItem("user", "")
     windowStorage.setItem("items", "")
     homeScreen();
@@ -88,21 +94,24 @@ function getListings() {
     let overlay = document.createElement("div")
     document.querySelector("body").appendChild(overlay)
     overlay.className = "overlay"
-        //using items url for now. will change when we have listings
+        //fetches all items. Rails includes the user in the response so we have access to that and we render items afterwards directly below
     let listingsUrl = "http://localhost:3000/items"
     fetch(listingsUrl)
         .then(res => res.json())
         .then(itemData => {
             console.log(itemData.map((item) => item.user))
             renderItems(itemData)
+                //itemData is an array of all item objects. [{obj1}, {obj2}, ...]
         })
 }
-//for development purposes
+//callled right above in render items. takes items and makes a ul/ li to list them.  each item has Brand, Model and trade rating listed as well as the user with a link to their profile
+//itemData is an array that we map over to create li elements with a link to the item owners profile and a trade button
 function renderItems(itemData) {
     let mainParentDiv = document.getElementById("page-content");
     let itemUl = document.createElement("ul")
     itemUl.className = "list-group"
     mainParentDiv.appendChild(itemUl)
+
     itemData.map((item) => {
         let itemLi = document.createElement("li")
         itemLi.className = "list-group-item"
@@ -113,12 +122,15 @@ function renderItems(itemData) {
         let itemUser = document.createElement("a")
         itemUser.href = "#Profile"
         itemUser.addEventListener("click", () => {
+            //check line 727 for showUserProfile()
+            //take a wild guess on what his function takes in as a param ;)
             showUserProfile(item.user.id)
         })
         itemUser.className = "ml-2"
         itemUser.innerText = `Owner: ${item.user.first_name} ${item.user.last_name}`
         itemLi.appendChild(itemUser)
         itemLi.appendChild(tradeBtn)
+            //check line 298 for onTradeStart()
         tradeBtn.addEventListener("click", () => onTradeStart(item));
         itemUl.appendChild(itemLi)
     })
@@ -126,6 +138,7 @@ function renderItems(itemData) {
 
 //Item Create
 function getItemForm(user_id) {
+    //form creation
     let pageWrapper = document.getElementById("whole-page-wrapper")
     let header = document.createElement("header")
     header.className = "masthead text-center text-white"
@@ -183,6 +196,8 @@ function getItemForm(user_id) {
     condLabel.innerText = "Condition: "
     let condList = document.createElement("select")
     condList.id = "cond-list"
+        //IMPORTANT: Back-End expects integers for both condition and retail_value. can only 1-5. this drop down only allows user to select within that range
+        //we do the same thing down below around line 212
     for (var i = 0; i < condArray.length; i++) {
         var option = document.createElement("option");
         option.value = i + 1;
@@ -235,6 +250,8 @@ function getItemForm(user_id) {
     itemForm.appendChild(valueList)
     itemForm.appendChild(itemSubmitBtn)
     formDiv.appendChild(itemForm)
+
+    //addItemEvent() can be found directly below. takes in the target in order to add event listener
     addItemEvent(itemForm)
     formDiv.className = "form-group justify-content-center ml-auto mr-auto"
 
@@ -242,14 +259,15 @@ function getItemForm(user_id) {
 
     mainParentDiv.appendChild(itemForm)
 }
-
+//this function adds an event listener to our item form made above
 function addItemEvent(target) {
     target.addEventListener("submit", (e) => {
+        //item submit directly below
         onItemSubmit()
         e.preventDefault()
     })
 }
-
+//sends a POST request to items controller, after item is submitted we return to user profile
 function onItemSubmit(e) {
     let brand = document.getElementById("brand-field").value
     let model = document.getElementById("model-field").value
@@ -279,25 +297,33 @@ function onItemSubmit(e) {
         })
         .then(res => res.json())
         .then(res => {
+            //show user profile around 726 
             showUserProfile(current_user().user.id)
             console.log(res)
         })
 
 }
-// let email = document.getElementById("login-email").value
-// let pw = document.getElementById("login-password").value
 
 //Trade Setup
 function onTradeStart(item) {
+    //tradestart called in the get listings function around 132
+    //checks for user confirmation before starting trade
     let c = confirm("Are you sure you want to trade for this item?")
     if (c !== false) {
+        //look below for startTrade
         startTrade(item);
     }
 }
 
 let tradeStatus = 0;
-
+//start trade takes in the item we clicked on from listings in order to begin the trade process
+//info we have access to here is: tradee_item_id >> we get this from item we clicked on in listings. 
+//tradee_id >> user id we have access to bc our listing fetch returns associated user with item
+//trader_id >> current_user 
+//trader_item_id >> this function will render all current user items. when you select an item, the id will be captured
+//all trades set to status: 0 by default which is pending
 function startTrade(item) {
+
     let parentDiv = document.getElementById("page-content")
     parentDiv.innerText = ""
     let itemUl = document.createElement("ul")
@@ -310,6 +336,8 @@ function startTrade(item) {
     let trader_items = current_user().items
     trader_items.map((tradeItems) => {
         let diff = Math.abs(tradee_rating - tradeItems.trade_rating)
+            //we substract the trade rating of the items in order to find the difference and use Math.abs() to return the absolute value
+            //if the difference id greater than 20 the item is rendered, however the button to trade is diabled
         if (diff >= 20) {
             let itemLi = document.createElement("li")
             itemLi.className = "list-group-item"
@@ -338,17 +366,20 @@ function startTrade(item) {
 }
 
 function getTrades(user) {
+    //gets all trades and calls retrieveuserinfo, this function is called inside showUserProfile()
     fetch(`http://localhost:3000/trades`)
         .then(res => res.json())
         .then(trades => {
             console.log(trades)
             trades.map((trade) => {
+                //map over all trades returned by fetch and calls function
                 retrieveUserInfoForTrade(user, trade)
 
             })
         })
 }
-
+//in order to have access to all the users so that we can include their names, we have to fetch them and call renderTradeInfo()
+//could possibly rewrite this to do one fetch for all users before we get trades in order to not have to hit database so much. 
 function retrieveUserInfoForTrade(user, trade) {
     fetch(`http://localhost:3000/users`)
         .then(res => res.json())
@@ -358,14 +389,21 @@ function retrieveUserInfoForTrade(user, trade) {
 }
 
 function renderTradeInfo(users, trade, user) {
+    //users: all users in database
+    //trade: the individual trade currently being mapped over
+    //user: the user who's profile we are viewing this info for
     let tradeList = document.getElementById("panel-body")
     let pendingTrade = document.getElementById("trade-ul")
+
     if (user.id === trade.tradee_id && trade.status === 0) {
+        //if pending trade and waiting on the users approval
         console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.style = "background-color: rgb(255,213,0, 0.5);"
         tradeLi.className = "list-group-item"
+            //the .find method is an iterator that returns the first item that matches the condition passed in. 
         tradeLi.innerText = ` Pending Trade From: ${users.find(user => user.id  === trade.trader_id).first_name}`
+            //only can approve or deny trade if the current user is on their own profile
         if (current_user().user.id == user.id) {
             let btnGroup = document.createElement("div")
             btnGroup.className = "btn-group-sm"
@@ -390,15 +428,18 @@ function renderTradeInfo(users, trade, user) {
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
     } else if (user.id === trade.tradee_id && trade.status === 2) {
+        //if trade is approved and user is the tradee
         console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.className = "list-group-item"
         tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
+            //we use .find a few times bc we want to differentiate between if the user is trader or tradee
         tradeLi.innerText = ` Traded With: ${users.find(user => user.id  === trade.trader_id).first_name}`
 
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
     } else if (user.id == trade.trader_id && trade.status == 2) {
+        //if trade is pending and user is the trader.
         console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.style = "background-color: rgb(82, 199, 115, 0.5);"
@@ -408,6 +449,7 @@ function renderTradeInfo(users, trade, user) {
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
     } else if (user.id == trade.trader_id && trade.status == 0) {
+        //if trade is pending and wating on another users approval.
         console.log(trade)
         let tradeLi = document.createElement("li")
         tradeLi.style = "background-color: rgb(255,213,0, 0.5);"
@@ -419,7 +461,7 @@ function renderTradeInfo(users, trade, user) {
     }
 
 }
-
+//this is called when a user clicks to approve or deny a trade it takes in the user, the specific trade, and the status(set above when a user clicks. 2 for approve, 3 for deny)
 function updateTrade(user, trade, status) {
     fetch(`http://localhost:3000/trades/${trade.id}`, {
             method: 'PATCH',
@@ -430,6 +472,7 @@ function updateTrade(user, trade, status) {
                 "Accept": "application/json"
             },
             body: JSON.stringify({
+
                 status: status
             })
         })
@@ -437,7 +480,7 @@ function updateTrade(user, trade, status) {
         .then(res => {
             console.log(res)
             if (status == 2) {
-
+                //again, we re-render this trade in the user profile after its updated
                 retrieveUserInfoForTrade(user, res.trade)
             }
         })
@@ -447,6 +490,8 @@ function updateTrade(user, trade, status) {
 
 function makeTrade(tradee, tradee_item_id, trader, tradeItems) {
     // debugger;
+    //this is the initial fetch with status: 0 
+    //renders user profile.
     fetch("http://localhost:3000/trades", {
             method: 'POST',
             mode: 'cors',
