@@ -591,6 +591,7 @@ function createUser() {
             addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
             addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
             addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
+            debugger;
             addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
             showUserProfile(res.id)
         })
@@ -688,6 +689,7 @@ function onLoginSubmit(event) {
                 let navbarDiv = document.getElementById('nav-div')
                 addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
                 addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
+                debugger;
                 addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
                 showUserProfile(res.user.id)
                 addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
