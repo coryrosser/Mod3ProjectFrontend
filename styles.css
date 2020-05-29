@@ -176,6 +176,15 @@ header.masthead .overlay {
     opacity: 0.4;
 }
 
+.form-overlay {
+    position: absolute;
+    background-color: #212529;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    opacity: 0.7;
+}
+
 header.masthead h1 {
     font-size: 6rem;
 }

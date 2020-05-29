@@ -127,6 +127,11 @@ function renderItems(itemData) {
 
 //Item Create
 function getItemForm(user_id) {
+    let pageWrapper = document.getElementById("whole-page-wrapper")
+    let header = document.createElement("header")
+    header.className = "masthead text-center text-white"
+    header.innerHTML = `<div class="form-overlay"></div>`
+    pageWrapper.appendChild(header)
     let mainParentDiv = document.getElementById("page-content");
     mainParentDiv.innerHTML = "";
     let formDiv = document.createElement("div")
