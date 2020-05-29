@@ -367,26 +367,27 @@ function renderTradeInfo(users, trade, user) {
         tradeLi.style = "background-color: rgb(255,213,0, 0.5);"
         tradeLi.className = "list-group-item"
         tradeLi.innerText = ` Pending Trade From: ${users.find(user => user.id  === trade.trader_id).first_name}`
-        let btnGroup = document.createElement("div")
-        btnGroup.className = "btn-group-sm"
+        if (current_user().user.id == user.id) {
+            let btnGroup = document.createElement("div")
+            btnGroup.className = "btn-group-sm"
 
-        let approveBtn = document.createElement("button")
-        approveBtn.innerText = "Approve"
-        approveBtn.className = "btn btn-sm btn-success"
-        approveBtn.addEventListener("click", () => {
-            tradeLi.remove()
-            updateTrade(user, trade, 2)
-        })
-        let denyBtn = document.createElement("button")
-        denyBtn.innerText = "Deny"
-        denyBtn.addEventListener("click", () => {
-            tradeLi.remove()
-            updateTrade(user, trade, 3)
-        })
-        denyBtn.className = "btn btn-sm btn-danger"
-        btnGroup.append(approveBtn, denyBtn)
-
-        tradeLi.appendChild(btnGroup)
+            let approveBtn = document.createElement("button")
+            approveBtn.innerText = "Approve"
+            approveBtn.className = "btn btn-sm btn-success"
+            approveBtn.addEventListener("click", () => {
+                tradeLi.remove()
+                updateTrade(user, trade, 2)
+            })
+            let denyBtn = document.createElement("button")
+            denyBtn.innerText = "Deny"
+            denyBtn.addEventListener("click", () => {
+                tradeLi.remove()
+                updateTrade(user, trade, 3)
+            })
+            denyBtn.className = "btn btn-sm btn-danger"
+            btnGroup.append(approveBtn, denyBtn)
+            tradeLi.appendChild(btnGroup)
+        }
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
     } else if (user.id === trade.tradee_id && trade.status === 2) {
@@ -407,6 +408,15 @@ function renderTradeInfo(users, trade, user) {
 
         pendingTrade.appendChild(tradeLi)
         tradeList.appendChild(pendingTrade)
+    } else if (user.id == trade.trader_id && trade.status == 0) {
+        console.log(trade)
+        let tradeLi = document.createElement("li")
+        tradeLi.style = "background-color: rgb(255,213,0, 0.5);"
+        tradeLi.className = "list-group-item"
+        tradeLi.innerText = `Trade Awaiting Approval From: ${users.find(user => user.id  === trade.tradee_id).first_name}`
+        pendingTrade.appendChild(tradeLi)
+        tradeList.appendChild(pendingTrade)
+
     }
 
 }
@@ -811,7 +821,7 @@ function createUserCard(user, parent) {
             if (c !== false) {
                 colSize.remove();
                 colSize2.remove();
-                
+
                 removeItem(item);
             }
         })
