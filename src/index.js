@@ -16,7 +16,6 @@ let current_user = () => {
     return userData
 }
 
-
 let homeScreen = () => {
     console.log("at home :)")
     let pageWrapper = document.getElementById("whole-page-wrapper")
@@ -807,28 +806,30 @@ function createUserCard(user, parent) {
         pTag.innerText = `
                 Rating: ${ item.trade_rating }
                 `
-        let removeItemButton = document.createElement("button")
-        removeItemButton.className = "input-group-btn btn btn-sm btn-primary"
-        removeItemButton.innerText = "Remove Item"
+        if (current_user().user.id == user.id) {
+            let removeItemButton = document.createElement("button")
+            removeItemButton.className = "input-group-btn btn btn-sm btn-primary"
+            removeItemButton.innerText = "Remove Item"
+            removeItemButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                let c = confirm("Are you sure you want to remove this item?")
+                if (c !== false) {
+                    colSize.remove();
+                    colSize2.remove();
 
+                    removeItem(item);
+                }
+            })
+            colSize2.appendChild(removeItemButton)
+        }
         colSize2.appendChild(pTag)
-        colSize2.appendChild(removeItemButton)
+
         row.append(colSize, colSize2)
         timelineDiv.appendChild(row)
-        removeItemButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            let c = confirm("Are you sure you want to remove this item?")
-            if (c !== false) {
-                colSize.remove();
-                colSize2.remove();
 
-                removeItem(item);
-            }
-        })
     })
 
     getTrades(user)
-
     addUserInfo(user, userInfoDiv, "first_name", )
     addUserInfo(user, userInfoDiv, "last_name")
     addUserInfo(user, userInfoDiv, "email")
@@ -875,37 +876,37 @@ function addUserInfo(user, parent, key) {
     pTag.innerText = user[key]
 
     colDiv2.appendChild(pTag)
+    if (current_user().user.id == user.id) {
+        let editBtn = document.createElement("a")
+        editBtn.className = "ml-2"
+        editBtn.innerHTML = ` <i class="fa fa-edit"> </i>`
 
-    let editBtn = document.createElement("a")
-    editBtn.className = "ml-2"
-    editBtn.innerHTML = ` <i class="fa fa-edit"> </i>`
+        editBtn.addEventListener("click", () => {
+            let attrEditForm = document.createElement("form")
+            attrEditForm.className = "form-group"
+            let attrEditField = document.createElement("input")
+            attrEditField.value = user[key]
+            attrEditField.className = "form-control col-xs-5"
+            let formDiv = document.createElement("div")
+            formDiv.className = "row"
+            formDiv.appendChild(attrEditField)
 
-    editBtn.addEventListener("click", () => {
-        let attrEditForm = document.createElement("form")
-        attrEditForm.className = "form-group"
-        let attrEditField = document.createElement("input")
-        attrEditField.value = user[key]
-        attrEditField.className = "form-control col-xs-5"
-        let formDiv = document.createElement("div")
-        formDiv.className = "row"
-        formDiv.appendChild(attrEditField)
-
-        let editSubmitBtn = document.createElement("button")
-        editSubmitBtn.className = "btn btn-sm btn-success"
-        editSubmitBtn.innerText = "Confirm"
-        editSubmitBtn.type = "submit"
-        formDiv.appendChild(editSubmitBtn)
-        attrEditForm.appendChild(formDiv)
-        colDiv2.innerHTML = ""
-        colDiv2.appendChild(attrEditForm)
-        attrEditForm.addEventListener("submit", (e) => {
-            let newValue = attrEditField.value
-            editUserAttribute(user, key, newValue, infoRow)
-            e.preventDefault()
+            let editSubmitBtn = document.createElement("button")
+            editSubmitBtn.className = "btn btn-sm btn-success"
+            editSubmitBtn.innerText = "Confirm"
+            editSubmitBtn.type = "submit"
+            formDiv.appendChild(editSubmitBtn)
+            attrEditForm.appendChild(formDiv)
+            colDiv2.innerHTML = ""
+            colDiv2.appendChild(attrEditForm)
+            attrEditForm.addEventListener("submit", (e) => {
+                let newValue = attrEditField.value
+                editUserAttribute(user, key, newValue, infoRow)
+                e.preventDefault()
+            })
         })
-    })
-    pTag.appendChild(editBtn)
-
+        pTag.appendChild(editBtn)
+    }
     infoRow.appendChild(colDiv2)
     parent.appendChild(infoRow)
 }

@@ -14,6 +14,8 @@ body {
     margin-bottom: 3%;
     border-radius: 0.5rem;
     background: #fff;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .form-group {
@@ -29,6 +31,13 @@ body {
 
 #nav-div a {
     color: #FFD500;
+    transition: 0.3s;
+}
+
+#nav-div a:hover {
+    background-color: #FFD500;
+    color: #111;
+    border-bottom-color: #111;
 }
 
 .profile-img {
