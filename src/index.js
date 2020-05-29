@@ -603,7 +603,7 @@ function getSignUpForm() {
     userformDiv.className = "form-group justify-content-center ml-auto mr-auto"
     userSignUpForm.className = "form-group justify-content-center ml-auto mr-auto"
     userformDiv.appendChild(userSignUpForm)
-
+        //look below for function
     addCreateUserEvent(userSignUpForm)
 
     mainParentDiv.appendChild(userSignUpForm)
@@ -618,6 +618,7 @@ function addCreateUserEvent(target) {
 
 
 function createUser() {
+    //user values captured from inputs and sent to rails in post request. after user create we render profile for new user
     let first_name = document.getElementById("user-first-name").value
     let last_name = document.getElementById("user-last-name").value
     let email = document.getElementById("user-email-input").value
@@ -643,6 +644,7 @@ function createUser() {
         .then(res => {
             console.log(res)
             windowStorage.clear()
+                //add user to localstorage as current user and change nav elements to reflect that a user is logged in
             windowStorage.setItem('user', JSON.stringify(res))
             windowStorage.setItem('items', JSON.stringify(res.items))
             navOnLogin()
@@ -657,6 +659,7 @@ function createUser() {
 }
 
 function navOnLogin() {
+    //removes login and sign up nav when called.
     document.getElementById("nav-item-login").remove()
     document.getElementById("nav-item-signup").remove()
 }
@@ -748,7 +751,6 @@ function onLoginSubmit(event) {
                 let navbarDiv = document.getElementById('nav-div')
                 addNavElement(navbarDiv, "Profile", "nav-item-profile", () => showUserProfile(current_user().user.id))
                 addNavElement(navbarDiv, "Item", "nav-item-form", () => getItemForm(current_user().user.id))
-                debugger;
                 addNavElement(navbarDiv, "Logout", "nav-item-logout", () => userLogout())
                 showUserProfile(res.user.id)
                 addNavElement(navbarDiv, "Listings", "nav-item-listings", getListings)
@@ -765,9 +767,10 @@ function showUserProfile(user_id) {
 
     let mainParentDiv = document.getElementById("page-content")
     mainParentDiv.innerHTML = ""
+        //we fetch the user who's profile we wish to view. rails will return all associated items as well
     fetchSingleUser(user_id, mainParentDiv)
 }
-
+//alot happens in this next function. will try to comment as needed
 function createUserCard(user, parent) {
     console.log(user)
     parent.className = "container ml-auto mr-auto"
@@ -840,6 +843,7 @@ function createUserCard(user, parent) {
         </div>`
     let timelineDiv = document.getElementById("timeline-content")
     let userInfoDiv = document.querySelector("div .tab-pane")
+        //map over items and create a list
     user.items.forEach((item) => {
         let row = document.createElement("div")
         row.className = "row mb-2"
@@ -916,9 +920,7 @@ function addUserInfo(user, parent, key) {
     colDiv.appendChild(keyLabel)
     let colDiv2 = document.createElement("div")
     colDiv2.className = "col-md-6"
-    colDiv2.id = `
-                $ { key }
-                _div `
+    colDiv2.id = `${ key }_div `
 
     let pTag = document.createElement("p")
     pTag.innerText = user[key]
